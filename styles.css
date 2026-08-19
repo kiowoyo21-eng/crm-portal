@@ -2338,3 +2338,1247 @@
     width: 100%;
   }
 }
+
+
+/* =========================================================
+   CRM PORTAL — PREMIUM UI OVERRIDE V1
+   Reference direction:
+   layered dark surfaces + premium gold + better readability
+========================================================= */
+
+:root {
+
+  /* BACKGROUNDS */
+  --crm-bg: #0d0f14;
+  --crm-sidebar: #12161c;
+  --crm-surface: #171b22;
+  --crm-surface-2: #1d222b;
+  --crm-surface-3: #222831;
+  --crm-header: #10141a;
+
+  /* GOLD */
+  --crm-gold: #f2b51d;
+  --crm-gold-hover: #ffc52b;
+  --crm-gold-soft: rgba(242, 181, 29, 0.12);
+  --crm-gold-border: rgba(242, 181, 29, 0.28);
+
+  /* TEXT */
+  --crm-text: #f5f6f8;
+  --crm-text-secondary: #c1c6cf;
+  --crm-text-muted: #8c939f;
+  --crm-placeholder: #737a86;
+
+  /* BORDERS */
+  --crm-border: #2b313b;
+  --crm-divider: #242a33;
+
+  /* STATES */
+  --crm-success: #36c96b;
+  --crm-danger: #ef5b5b;
+  --crm-info: #4388ff;
+  --crm-warning: #f2b51d;
+
+  /* EFFECTS */
+  --crm-radius-sm: 8px;
+  --crm-radius: 12px;
+  --crm-radius-lg: 16px;
+
+  --crm-shadow:
+    0 16px 45px rgba(0, 0, 0, 0.30);
+
+  --crm-shadow-modal:
+    0 30px 90px rgba(0, 0, 0, 0.60);
+}
+
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background: var(--crm-bg);
+  color: var(--crm-text);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+
+/* Improve visibility across old small text */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+
+.portal-layout {
+  background: var(--crm-bg);
+}
+
+.main-content {
+  background: var(--crm-bg);
+  min-width: 0;
+}
+
+.content-area {
+  padding: 28px 30px 40px;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+  background:
+    linear-gradient(
+      180deg,
+      #12161c 0%,
+      #0f1318 100%
+    );
+
+  border-right:
+    1px solid var(--crm-border);
+}
+
+.sidebar-brand {
+  padding: 25px 20px 22px;
+  border-bottom:
+    1px solid var(--crm-divider);
+}
+
+.sidebar-brand-title {
+  color: var(--crm-gold);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+.sidebar-brand-subtitle {
+  color: var(--crm-text-muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.nav-section-title {
+  color: var(--crm-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+
+  padding: 20px 18px 8px;
+}
+
+.nav-item {
+  width: calc(100% - 20px);
+
+  margin:
+    3px 10px;
+
+  padding:
+    11px 13px;
+
+  min-height: 43px;
+
+  display: flex;
+  align-items: center;
+
+  color: var(--crm-text-secondary);
+
+  background: transparent;
+
+  border:
+    1px solid transparent;
+
+  border-radius:
+    var(--crm-radius-sm);
+
+  font-size: 14px;
+  font-weight: 500;
+
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.nav-item:hover {
+  color: var(--crm-text);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  border-color:
+    rgba(255, 255, 255, 0.05);
+}
+
+.nav-item.active {
+  color: var(--crm-gold);
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(242, 181, 29, 0.16),
+      rgba(242, 181, 29, 0.07)
+    );
+
+  border-color:
+    rgba(242, 181, 29, 0.18);
+
+  box-shadow:
+    inset 3px 0 0
+    var(--crm-gold);
+}
+
+.sidebar-bottom {
+  border-top:
+    1px solid var(--crm-divider);
+
+  padding-top: 10px;
+}
+
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.topbar {
+  min-height: 68px;
+
+  padding:
+    0 30px;
+
+  background:
+    rgba(16, 20, 26, 0.94);
+
+  border-bottom:
+    1px solid var(--crm-border);
+
+  backdrop-filter:
+    blur(12px);
+}
+
+.page-title {
+  color: var(--crm-text);
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.user-name {
+  color: var(--crm-text);
+
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.user-role {
+  color: var(--crm-text-muted);
+
+  font-size: 12px;
+}
+
+.branch-badge {
+  color: var(--crm-gold);
+
+  background:
+    var(--crm-gold-soft);
+
+  border:
+    1px solid var(--crm-gold-border);
+
+  padding:
+    6px 10px;
+
+  border-radius:
+    999px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   HEADINGS
+========================================================= */
+
+.dashboard-eyebrow {
+  color: var(--crm-gold);
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 1.3px;
+
+  text-transform: uppercase;
+}
+
+.welcome-title {
+  margin-top: 4px;
+
+  color: var(--crm-text);
+
+  font-size: 25px;
+  font-weight: 750;
+
+  line-height: 1.2;
+}
+
+.welcome-text,
+.panel-subtitle,
+.kpi-subtext {
+  color: var(--crm-text-muted);
+
+  font-size: 13px;
+}
+
+.dashboard-date {
+  color: var(--crm-text-secondary);
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   CARDS / PANELS
+========================================================= */
+
+.kpi-card,
+.dashboard-panel,
+.report-section,
+.appointment-calendar-card,
+.requests-panel {
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--crm-surface),
+      #14181e
+    );
+
+  border:
+    1px solid var(--crm-border);
+
+  border-radius:
+    var(--crm-radius);
+
+  box-shadow:
+    0 8px 28px
+    rgba(0, 0, 0, 0.16);
+}
+
+.kpi-card {
+  padding: 19px 20px;
+  min-height: 128px;
+}
+
+.kpi-card-clickable {
+  cursor: pointer;
+
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.kpi-card-clickable:hover {
+  border-color:
+    var(--crm-gold-border);
+
+  background:
+    linear-gradient(
+      145deg,
+      #1b2028,
+      #161a20
+    );
+
+  transform:
+    translateY(-1px);
+}
+
+.kpi-label {
+  color: var(--crm-text-muted);
+
+  font-size: 11px;
+  font-weight: 750;
+
+  letter-spacing: 0.8px;
+}
+
+.kpi-value {
+  color: var(--crm-text);
+
+  font-size: 30px;
+  line-height: 1.1;
+
+  font-weight: 750;
+
+  margin-top: 13px;
+}
+
+.kpi-icon {
+  width: 30px;
+  height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--crm-gold);
+
+  background:
+    var(--crm-gold-soft);
+
+  border:
+    1px solid var(--crm-gold-border);
+
+  border-radius:
+    8px;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   PANEL HEADERS
+========================================================= */
+
+.panel-header {
+  padding:
+    18px 20px;
+
+  border-bottom:
+    1px solid var(--crm-divider);
+}
+
+.panel-title {
+  color: var(--crm-text);
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   INPUTS / SEARCH / SELECT
+========================================================= */
+
+input,
+select,
+textarea {
+
+  color:
+    var(--crm-text);
+
+  background:
+    #151a20;
+
+  border:
+    1px solid var(--crm-border);
+
+  border-radius:
+    9px;
+
+  min-height: 42px;
+
+  padding:
+    10px 12px;
+
+  font-size:
+    14px;
+
+  outline:
+    none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color:
+    var(--crm-placeholder);
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color:
+    #3a424e;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+
+  background:
+    #171c23;
+
+  border-color:
+    var(--crm-gold);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(242, 181, 29, 0.10);
+}
+
+
+/* Search fields should feel obvious */
+#leadSearch,
+#leadBranchFilter,
+#leadStatusFilter,
+#leadServiceFilter,
+#reportStartDate,
+#reportEndDate,
+#reportBranchFilter {
+
+  min-height:
+    44px;
+
+  font-size:
+    14px;
+}
+
+
+/* =========================================================
+   FORM LABELS
+========================================================= */
+
+.form-group label,
+.modal-form label,
+.report-filter-bar label {
+
+  display: block;
+
+  color:
+    var(--crm-text-secondary);
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+
+  margin-bottom:
+    7px;
+
+  letter-spacing:
+    0.25px;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.login-button,
+.primary-action,
+.report-apply-button {
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffc129,
+      #e9a900
+    );
+
+  color:
+    #161616;
+
+  border:
+    1px solid
+    #ffc52b;
+
+  border-radius:
+    9px;
+
+  min-height:
+    42px;
+
+  padding:
+    10px 16px;
+
+  font-size:
+    13px;
+
+  font-weight:
+    800;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.login-button:hover,
+.primary-action:hover,
+.report-apply-button:hover {
+
+  background:
+    var(--crm-gold-hover);
+
+  box-shadow:
+    0 7px 20px
+    rgba(242, 181, 29, 0.17);
+}
+
+.secondary-action,
+.table-action,
+.panel-action {
+
+  min-height:
+    38px;
+
+  padding:
+    8px 12px;
+
+  color:
+    var(--crm-text-secondary);
+
+  background:
+    var(--crm-surface-2);
+
+  border:
+    1px solid var(--crm-border);
+
+  border-radius:
+    8px;
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+
+  cursor:
+    pointer;
+
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.secondary-action:hover,
+.table-action:hover,
+.panel-action:hover {
+
+  color:
+    var(--crm-gold);
+
+  border-color:
+    var(--crm-gold-border);
+
+  background:
+    #20252d;
+}
+
+
+/* =========================================================
+   TABLES
+========================================================= */
+
+table {
+  width: 100%;
+}
+
+thead {
+  background:
+    #12161c;
+}
+
+th {
+
+  color:
+    #a5acb7;
+
+  font-size:
+    11px !important;
+
+  font-weight:
+    750;
+
+  letter-spacing:
+    0.5px;
+
+  text-transform:
+    uppercase;
+
+  padding:
+    13px 14px !important;
+
+  border-bottom:
+    1px solid
+    var(--crm-border) !important;
+}
+
+td {
+
+  color:
+    var(--crm-text-secondary);
+
+  font-size:
+    13px !important;
+
+  padding:
+    13px 14px !important;
+
+  border-bottom:
+    1px solid
+    var(--crm-divider) !important;
+
+  vertical-align:
+    middle;
+}
+
+tbody tr {
+  transition:
+    background 0.15s ease;
+}
+
+tbody tr:hover {
+  background:
+    #1b2027;
+}
+
+.customer-cell strong {
+  color:
+    var(--crm-text);
+
+  font-size:
+    14px;
+}
+
+.customer-cell span,
+.vehicle-cell span {
+  color:
+    var(--crm-text-muted);
+
+  font-size:
+    12px;
+}
+
+
+/* =========================================================
+   STATUS SELECT
+========================================================= */
+
+.status-select {
+  min-height:
+    34px;
+
+  padding:
+    5px 9px;
+
+  font-size:
+    12px;
+
+  font-weight:
+    650;
+
+  border-radius:
+    7px;
+}
+
+
+/* =========================================================
+   MODALS / POPUPS
+========================================================= */
+
+.modal,
+.modal-overlay,
+#appointmentDetailsModal,
+#selectedAppointmentDatePanel {
+
+  backdrop-filter:
+    blur(7px);
+}
+
+.modal.show,
+.modal-overlay.show {
+
+  background:
+    rgba(5, 7, 10, 0.76);
+}
+
+.modal-content,
+.modal-card,
+.modal-panel {
+
+  background:
+    linear-gradient(
+      145deg,
+      #1b2027,
+      #14181e
+    );
+
+  border:
+    1px solid
+    #353c47;
+
+  border-radius:
+    16px;
+
+  box-shadow:
+    var(--crm-shadow-modal);
+}
+
+
+/* Existing modal titles */
+.modal-title,
+.modal-header h2,
+.modal-header h3 {
+
+  color:
+    var(--crm-text);
+
+  font-size:
+    19px;
+
+  font-weight:
+    750;
+}
+
+
+/* Modal descriptive text */
+.modal-subtitle,
+.modal-description {
+
+  color:
+    var(--crm-text-muted);
+
+  font-size:
+    13px;
+}
+
+
+/* Better modal spacing */
+.modal-body {
+  padding:
+    20px 22px;
+}
+
+.modal-footer {
+
+  display:
+    flex;
+
+  justify-content:
+    flex-end;
+
+  gap:
+    10px;
+
+  padding:
+    16px 22px;
+
+  border-top:
+    1px solid
+    var(--crm-divider);
+}
+
+
+/* =========================================================
+   VEHICLE AUTOCOMPLETE / SEARCH RESULTS
+========================================================= */
+
+.vehicle-suggestions,
+#newLeadVehicleSuggestions,
+#editLeadVehicleSuggestions {
+
+  background:
+    #1b2027;
+
+  border:
+    1px solid
+    #343b45;
+
+  border-radius:
+    10px;
+
+  box-shadow:
+    0 18px 45px
+    rgba(0, 0, 0, 0.44);
+
+  overflow:
+    hidden;
+
+  max-height:
+    280px;
+
+  overflow-y:
+    auto;
+}
+
+.vehicle-suggestion-item {
+
+  padding:
+    11px 13px;
+
+  min-height:
+    42px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  color:
+    var(--crm-text-secondary);
+
+  font-size:
+    14px;
+
+  cursor:
+    pointer;
+
+  border-bottom:
+    1px solid
+    rgba(255,255,255,0.04);
+
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+}
+
+.vehicle-suggestion-item:hover {
+
+  color:
+    var(--crm-text);
+
+  background:
+    #242a33;
+}
+
+.vehicle-add-item {
+
+  color:
+    var(--crm-gold);
+
+  font-weight:
+    700;
+
+  background:
+    rgba(242,181,29,0.05);
+}
+
+
+/* =========================================================
+   REPORTS
+========================================================= */
+
+#reportsView th {
+  font-size:
+    11px !important;
+
+  color:
+    #a4abb6;
+}
+
+#reportsView td {
+  font-size:
+    13px !important;
+
+  color:
+    var(--crm-text-secondary);
+}
+
+.report-toggle {
+
+  min-height:
+    48px;
+
+  color:
+    var(--crm-text);
+
+  font-size:
+    14px;
+
+  font-weight:
+    700;
+
+  background:
+    transparent;
+
+  border:
+    none;
+
+  width:
+    100%;
+
+  padding:
+    12px 15px;
+
+  cursor:
+    pointer;
+}
+
+.report-toggle:hover {
+  background:
+    rgba(255,255,255,0.025);
+}
+
+.report-toggle-icon {
+
+  width:
+    26px;
+
+  height:
+    26px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  color:
+    var(--crm-gold);
+
+  border:
+    1px solid
+    var(--crm-gold-border);
+
+  border-radius:
+    7px;
+}
+
+
+/* =========================================================
+   APPOINTMENT CALENDAR
+========================================================= */
+
+.calendar-day {
+
+  min-height:
+    106px;
+
+  background:
+    #151a20;
+
+  border:
+    1px solid
+    var(--crm-divider);
+
+  padding:
+    10px;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.calendar-day:hover {
+
+  background:
+    #1e242c;
+
+  border-color:
+    #3a424c;
+}
+
+.calendar-day.today {
+
+  border-color:
+    var(--crm-gold);
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(242,181,29,0.22);
+}
+
+.calendar-day-number {
+
+  color:
+    var(--crm-text);
+
+  font-size:
+    13px;
+
+  font-weight:
+    700;
+}
+
+.calendar-branch-count {
+
+  font-size:
+    11px;
+
+  color:
+    var(--crm-text-secondary);
+}
+
+.calendar-branch-count strong {
+
+  color:
+    var(--crm-gold);
+}
+
+
+/* =========================================================
+   EMPTY STATES
+========================================================= */
+
+.table-empty,
+.calendar-empty,
+.report-empty,
+.empty-text {
+
+  color:
+    var(--crm-text-muted);
+
+  font-size:
+    13px;
+
+  line-height:
+    1.55;
+}
+
+.empty-title {
+
+  color:
+    var(--crm-text);
+
+  font-size:
+    15px;
+
+  font-weight:
+    700;
+}
+
+
+/* =========================================================
+   SCROLLBARS
+========================================================= */
+
+* {
+  scrollbar-width:
+    thin;
+
+  scrollbar-color:
+    #3a414b
+    transparent;
+}
+
+::-webkit-scrollbar {
+  width:
+    8px;
+
+  height:
+    8px;
+}
+
+::-webkit-scrollbar-thumb {
+
+  background:
+    #353c46;
+
+  border-radius:
+    10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:
+    #474f5b;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (
+  max-width: 900px
+) {
+
+  .content-area {
+    padding:
+      20px;
+  }
+
+  .topbar {
+    padding:
+      0 20px;
+  }
+
+  .welcome-title {
+    font-size:
+      22px;
+  }
+
+  .kpi-value {
+    font-size:
+      26px;
+  }
+
+}
+
+
+@media (
+  max-width: 640px
+) {
+
+  body {
+    font-size:
+      14px;
+  }
+
+  .content-area {
+    padding:
+      16px;
+  }
+
+  input,
+  select,
+  textarea {
+
+    font-size:
+      16px;
+    /* avoids mobile browser zoom */
+
+  }
+
+}
