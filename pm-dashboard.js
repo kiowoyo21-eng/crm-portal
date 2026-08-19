@@ -562,80 +562,6 @@ function renderWeeklyAppointments(
 }
 
 
-// ========================================
-// OPEN PM REMINDER QUEUE
-// ========================================
-
-function openPMReminderQueue() {
-
-  const menuButtons =
-    document.querySelectorAll(
-      "#sidebarMenu .nav-item"
-    );
-
-
-  let appointmentsButton =
-    null;
-
-
-  menuButtons.forEach(
-    function(button) {
-
-      if (
-        String(
-          button.textContent || ""
-        )
-          .trim() ===
-        "Appointments"
-      ) {
-
-        appointmentsButton =
-          button;
-
-      }
-
-    }
-  );
-
-
-  setTimeout(
-    function() {
-
-      const tomorrow =
-        new Date();
-
-
-      tomorrow.setDate(
-        tomorrow.getDate() + 1
-      );
-
-
-      const tomorrowKey =
-        formatCalendarDateKey(
-          tomorrow
-        );
-
-
-      appointmentCalendarDate =
-        new Date(
-          tomorrow.getFullYear(),
-          tomorrow.getMonth(),
-          1
-        );
-
-
-      renderAppointmentsCalendar();
-
-
-      openAppointmentDate(
-        tomorrowKey
-      );
-
-    },
-    200
-  );
-
-}
 
 
 // ========================================
@@ -1107,5 +1033,564 @@ function closeDashboardAppointmentPopup() {
     modal.remove();
 
   }
+
+}
+
+
+function openDashboardQueueModal(
+  title,
+  subtitle
+) {
+
+  const oldModal =
+    document.getElementById(
+      "pmDashboardQueueModal"
+    );
+
+  if (oldModal) {
+    oldModal.remove();
+  }
+
+
+  const overlay =
+    document.createElement(
+      "div"
+    );
+
+  overlay.id =
+    "pmDashboardQueueModal";
+
+  overlay.className =
+    "crm-queue-overlay";
+
+
+  const modal =
+    document.createElement(
+      "div"
+    );
+
+  modal.className =
+    "crm-queue-modal";
+
+
+  modal.innerHTML = `
+
+    <div class="crm-queue-header">
+
+      <div>
+
+        <div class="crm-queue-eyebrow">
+          PAGE MANAGER
+        </div>
+
+        <h2 class="crm-queue-title">
+          ${escapeHtml(title)}
+        </h2>
+
+        <div class="crm-queue-subtitle">
+          ${escapeHtml(subtitle)}
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="crm-queue-close"
+        id="pmQueueClose"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      class="crm-queue-body"
+      id="pmDashboardQueueBody"
+    >
+      <div class="crm-queue-loading">
+        Loading...
+      </div>
+    </div>
+  `;
+
+
+  overlay.appendChild(
+    modal
+  );
+
+  document.body.appendChild(
+    overlay
+  );
+
+
+  document
+    .getElementById(
+      "pmQueueClose"
+    )
+    .onclick =
+    function() {
+
+      overlay.remove();
+
+    };
+
+
+  overlay.onclick =
+    function(event) {
+
+      if (
+        event.target ===
+        overlay
+      ) {
+
+        overlay.remove();
+
+      }
+
+    };
+
+
+  return {
+    overlay:
+      overlay,
+
+    body:
+      document.getElementById(
+        "pmDashboardQueueBody"
+      )
+  };
+
+}
+
+async function openPMFollowUpQueue() {
+
+  const modal =
+    openDashboardQueueModal(
+      "Follow-Up Queue",
+      "Leads that currently need follow-up."
+    );
+
+
+  try {
+
+    const result =
+      await crmApi(
+        "getLeadsData"
+      );
+
+
+    if (
+      !result ||
+      !result.success
+    ) {
+
+      modal.body.innerHTML = `
+        <div class="crm-queue-empty">
+          Unable to load follow-up leads.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    const leads =
+      (result.leads || [])
+        .filter(function(lead) {
+
+          return (
+            String(
+              lead.status || ""
+            )
+              .trim()
+              .toLowerCase() ===
+            "follow up"
+          );
+
+        });
+
+
+    if (!leads.length) {
+
+      modal.body.innerHTML = `
+        <div class="crm-queue-empty">
+
+          <div class="crm-queue-empty-icon">
+            ✓
+          </div>
+
+          <strong>
+            No follow-ups pending
+          </strong>
+
+          <span>
+            There are currently no leads
+            marked for follow-up.
+          </span>
+
+        </div>
+      `;
+
+      return;
+    }
+
+
+    let html = `
+      <div class="crm-queue-list">
+    `;
+
+
+    leads.forEach(function(lead) {
+
+      html += `
+
+        <div class="crm-queue-item">
+
+          <div class="crm-queue-main">
+
+            <div class="crm-queue-name">
+              ${escapeHtml(
+                lead.customerName || "—"
+              )}
+            </div>
+
+            <div class="crm-queue-meta">
+
+              <span>
+                ${escapeHtml(
+                  lead.vehicle || "—"
+                )}
+              </span>
+
+              <span>
+                ${escapeHtml(
+                  lead.branchId || "—"
+                )}
+              </span>
+
+              <span>
+                ${escapeHtml(
+                  lead.service || "—"
+                )}
+              </span>
+
+            </div>
+
+            <div class="crm-queue-detail">
+              ${escapeHtml(
+                lead.concern ||
+                "No additional details."
+              )}
+            </div>
+
+          </div>
+
+
+          <div class="crm-queue-actions">
+
+            <button
+              type="button"
+              class="secondary-action"
+              onclick="closePMDashboardQueue(); openLeadFromDashboard('${escapeJs(
+                lead.leadId
+              )}')"
+            >
+              VIEW LEAD
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    });
+
+
+    html += `
+      </div>
+
+      <div class="crm-queue-footer">
+
+        <span>
+          ${leads.length}
+          follow-up${leads.length === 1 ? "" : "s"}
+        </span>
+
+        <button
+          type="button"
+          class="primary-action"
+          onclick="closePMDashboardQueue(); selectDashboardModule('Leads')"
+        >
+          OPEN LEADS
+        </button>
+
+      </div>
+    `;
+
+
+    modal.body.innerHTML =
+      html;
+
+
+  } catch (error) {
+
+    console.error(
+      "Follow-up queue error:",
+      error
+    );
+
+    modal.body.innerHTML = `
+      <div class="crm-queue-empty">
+        Unable to connect to the CRM.
+      </div>
+    `;
+
+  }
+
+}
+
+async function openPMReminderQueue() {
+
+  const modal =
+    openDashboardQueueModal(
+      "Tomorrow's Reminders",
+      "Appointments scheduled for tomorrow."
+    );
+
+
+  try {
+
+    const result =
+      await crmApi(
+        "getAppointmentsData"
+      );
+
+
+    if (
+      !result ||
+      !result.success
+    ) {
+
+      modal.body.innerHTML = `
+        <div class="crm-queue-empty">
+          Unable to load appointments.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    const tomorrow =
+      new Date();
+
+    tomorrow.setDate(
+      tomorrow.getDate() + 1
+    );
+
+
+    const tomorrowKey =
+      formatCalendarDateKey(
+        tomorrow
+      );
+
+
+    const appointments =
+      (result.appointments || [])
+        .filter(function(item) {
+
+          return (
+            String(
+              item.appointmentDate || ""
+            ).trim() ===
+            tomorrowKey
+          );
+
+        });
+
+
+    if (!appointments.length) {
+
+      modal.body.innerHTML = `
+        <div class="crm-queue-empty">
+
+          <div class="crm-queue-empty-icon">
+            ✓
+          </div>
+
+          <strong>
+            No reminders for tomorrow
+          </strong>
+
+          <span>
+            No appointments are currently
+            scheduled for tomorrow.
+          </span>
+
+        </div>
+      `;
+
+      return;
+    }
+
+
+    let html = `
+      <div class="crm-queue-list">
+    `;
+
+
+    appointments.forEach(
+      function(item) {
+
+        html += `
+
+          <div class="crm-queue-item">
+
+            <div class="crm-queue-main">
+
+              <div class="crm-queue-name">
+                ${escapeHtml(
+                  item.customerName || "—"
+                )}
+              </div>
+
+              <div class="crm-queue-meta">
+
+                <span>
+                  ${escapeHtml(
+                    item.appointmentTime || "—"
+                  )}
+                </span>
+
+                <span>
+                  ${escapeHtml(
+                    item.vehicle || "—"
+                  )}
+                </span>
+
+                <span>
+                  ${escapeHtml(
+                    item.branchId || "—"
+                  )}
+                </span>
+
+              </div>
+
+              <div class="crm-queue-detail">
+                ${escapeHtml(
+                  item.service ||
+                  "Appointment"
+                )}
+              </div>
+
+            </div>
+
+
+            <div class="crm-queue-status">
+              ${escapeHtml(
+                item.status || "Booked"
+              )}
+            </div>
+
+          </div>
+        `;
+
+      }
+    );
+
+
+    html += `
+      </div>
+
+      <div class="crm-queue-footer">
+
+        <span>
+          ${appointments.length}
+          appointment${appointments.length === 1 ? "" : "s"}
+        </span>
+
+        <button
+          type="button"
+          class="primary-action"
+          onclick="closePMDashboardQueue(); selectDashboardModule('Appointments')"
+        >
+          OPEN APPOINTMENTS
+        </button>
+
+      </div>
+    `;
+
+
+    modal.body.innerHTML =
+      html;
+
+
+  } catch (error) {
+
+    console.error(
+      "Reminder queue error:",
+      error
+    );
+
+    modal.body.innerHTML = `
+      <div class="crm-queue-empty">
+        Unable to connect to the CRM.
+      </div>
+    `;
+
+  }
+
+}
+
+function closePMDashboardQueue() {
+
+  const modal =
+    document.getElementById(
+      "pmDashboardQueueModal"
+    );
+
+  if (modal) {
+    modal.remove();
+  }
+
+}
+
+
+function openLeadFromDashboard(
+  leadId
+) {
+
+  selectDashboardModule(
+    "Leads"
+  );
+
+
+  setTimeout(
+    function() {
+
+      const lead =
+        currentLeads.find(
+          function(item) {
+
+            return (
+              item.leadId ===
+              leadId
+            );
+
+          }
+        );
+
+
+      if (lead) {
+
+        editLead(
+          leadId
+        );
+
+      }
+
+    },
+    300
+  );
 
 }
