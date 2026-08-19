@@ -1,205 +1,484 @@
 let currentUser = null;
-    let currentLeads = [];
+let currentLeads = [];
 
-    const SESSION_KEY = "crm_session";
-const LAST_ACTIVITY_KEY = "crm_last_activity";
+
+const SESSION_KEY =
+  "crm_session";
+
+const LAST_ACTIVITY_KEY =
+  "crm_last_activity";
+
 
 const SESSION_TIMEOUT =
-  60 * 60 * 1000; // 1 hour
+  60 * 60 * 1000;
+// 1 hour inactivity
 
 
+// ========================================
+// LOGIN
+// ========================================
 
-    /* =========================
-       LOGIN
-       ========================= */
+document
+  .getElementById("loginForm")
+  .addEventListener(
+    "submit",
+    async function(event) {
 
-    document
-      .getElementById("loginForm")
-      .addEventListener("submit", function(event) {
+      event.preventDefault();
 
-        event.preventDefault();
 
-        const username =
-          document.getElementById("username")
-            .value
-            .trim();
+      const username =
+        document
+          .getElementById("username")
+          .value
+          .trim();
 
-        const password =
-          document.getElementById("password")
-            .value;
 
-        const button =
-          document.getElementById("loginButton");
+      const password =
+        document
+          .getElementById("password")
+          .value;
 
-        const loading =
-          document.getElementById("loading");
 
-        const message =
-          document.getElementById("message");
+      const button =
+        document.getElementById(
+          "loginButton"
+        );
 
-        message.className = "message";
-        message.textContent = "";
 
-        button.disabled = true;
-        loading.style.display = "block";
+      const loading =
+        document.getElementById(
+          "loading"
+        );
 
-        google.script.run
 
-          .withSuccessHandler(function(result) {
+      const message =
+        document.getElementById(
+          "message"
+        );
 
-            button.disabled = false;
-            loading.style.display = "none";
 
-           if (result.success) {
+      // Reset message
+      message.className =
+        "message";
 
-currentUser = result;
+      message.textContent =
+        "";
 
-localStorage.setItem(
-  SESSION_KEY,
-  JSON.stringify(result)
-);
 
-localStorage.setItem(
-  LAST_ACTIVITY_KEY,
-  Date.now().toString()
-);
+      // Loading state
+      button.disabled =
+        true;
 
-// Load standardized vehicle list
-loadVehicleCatalog();
+      loading.style.display =
+        "block";
 
-showPortal(result);
 
-} else {
+      try {
 
-  message.className =
-    "message error";
+        // ================================
+        // LOGIN THROUGH APPS SCRIPT API
+        // ================================
 
-  message.textContent =
-    result.message;
-}
+        const result =
+          await crmApi(
+            "login",
+            {
+              username:
+                username,
 
-          })
-
-          .withFailureHandler(function(error) {
-
-            button.disabled = false;
-            loading.style.display = "none";
-
-            message.className =
-              "message error";
-
-            message.textContent =
-              "Unable to connect to the CRM.";
-
-            console.error(error);
-
-          })
-
-          .authenticateUser(
-            username,
-            password
+              password:
+                password
+            }
           );
 
-      });
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          message.className =
+            "message error";
+
+          message.textContent =
+            result &&
+            result.message
+              ? result.message
+              : "Unable to login.";
+
+          return;
+
+        }
 
 
-    /* =========================
-       SHOW PORTAL
-       ========================= */
+        // ================================
+        // SAVE API SESSION
+        // ================================
+
+        saveCrmSession(
+          result
+        );
 
 
-function logout() {
+        // ================================
+        // CURRENT USER
+        // ================================
 
-  google.script.run
+        currentUser = {
 
-    .withSuccessHandler(function(result) {
+          userId:
+            result.userId || "",
 
-      currentUser = null;
+          employeeId:
+            result.employeeId || "",
 
-      localStorage.removeItem(
-        SESSION_KEY
+          fullName:
+            result.fullName || "",
+
+          systemRole:
+            result.systemRole || "",
+
+          branchId:
+            result.branchId || "",
+
+          accessStatus:
+            result.accessStatus || "",
+
+          expiresAt:
+            result.expiresAt || ""
+
+        };
+
+
+        // ================================
+        // SAVE LOCAL UI SESSION
+        // ================================
+
+        localStorage.setItem(
+          SESSION_KEY,
+          JSON.stringify(
+            currentUser
+          )
+        );
+
+
+        localStorage.setItem(
+          LAST_ACTIVITY_KEY,
+          Date.now().toString()
+        );
+
+
+        // ================================
+        // LOAD VEHICLES
+        // ================================
+
+        loadVehicleCatalog();
+
+
+        // ================================
+        // ENTER PORTAL
+        // ================================
+
+        showPortal(
+          currentUser
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "CRM login error:",
+          error
+        );
+
+
+        message.className =
+          "message error";
+
+
+        message.textContent =
+          "Unable to connect to the CRM.";
+
+      } finally {
+
+        button.disabled =
+          false;
+
+        loading.style.display =
+          "none";
+
+      }
+
+    }
+  );
+
+
+// ========================================
+// LOGOUT
+// ========================================
+
+async function logout() {
+
+  try {
+
+    // Attempt to invalidate
+    // server-side API session.
+    const token =
+      localStorage.getItem(
+        "crmSessionToken"
       );
 
-      localStorage.removeItem(
-        LAST_ACTIVITY_KEY
+
+    if (token) {
+
+      await crmApi(
+        "logout"
       );
 
-      document
-        .getElementById("portalPage")
-        .style.display = "none";
+    }
 
-      document
-        .getElementById("loginPage")
-        .style.display = "flex";
 
-      document
-        .getElementById("loginForm")
-        .reset();
+  } catch (error) {
 
-      document
-        .getElementById("pageTitle")
-        .textContent =
-        "Dashboard";
+    // Logout locally even if
+    // API logout fails.
+    console.error(
+      "API logout error:",
+      error
+    );
 
-    })
+  } finally {
 
-    .withFailureHandler(function(error) {
+    clearLocalCrmLogin();
 
-      alert(
-        "Unable to logout properly."
-      );
-
-      console.error(error);
-
-    })
-
-    .logoutUser();
+  }
 
 }
 
 
-    // =========================
+// ========================================
+// CLEAR LOCAL LOGIN
+// ========================================
+
+function clearLocalCrmLogin() {
+
+  currentUser =
+    null;
+
+
+  // New API session storage
+  clearCrmSession();
+
+
+  // Existing CRM UI storage
+  localStorage.removeItem(
+    SESSION_KEY
+  );
+
+
+  localStorage.removeItem(
+    LAST_ACTIVITY_KEY
+  );
+
+
+  const portalPage =
+    document.getElementById(
+      "portalPage"
+    );
+
+
+  const loginPage =
+    document.getElementById(
+      "loginPage"
+    );
+
+
+  const loginForm =
+    document.getElementById(
+      "loginForm"
+    );
+
+
+  const pageTitle =
+    document.getElementById(
+      "pageTitle"
+    );
+
+
+  if (portalPage) {
+
+    portalPage.style.display =
+      "none";
+
+  }
+
+
+  if (loginPage) {
+
+    loginPage.style.display =
+      "flex";
+
+  }
+
+
+  if (loginForm) {
+
+    loginForm.reset();
+
+  }
+
+
+  if (pageTitle) {
+
+    pageTitle.textContent =
+      "Dashboard";
+
+  }
+
+}
+
+
+// ========================================
 // RESTORE SAVED SESSION
-// =========================
+// ========================================
 
 function restoreSession() {
 
   const savedSession =
-    localStorage.getItem(SESSION_KEY);
+    localStorage.getItem(
+      SESSION_KEY
+    );
+
 
   const lastActivity =
-    localStorage.getItem(LAST_ACTIVITY_KEY);
+    localStorage.getItem(
+      LAST_ACTIVITY_KEY
+    );
 
-  if (!savedSession || !lastActivity) {
+
+  const apiToken =
+    localStorage.getItem(
+      "crmSessionToken"
+    );
+
+
+  // We now require BOTH:
+  // local user + API token.
+  if (
+    !savedSession ||
+    !lastActivity ||
+    !apiToken
+  ) {
+
+    clearCrmSession();
+
+    localStorage.removeItem(
+      SESSION_KEY
+    );
+
+    localStorage.removeItem(
+      LAST_ACTIVITY_KEY
+    );
+
     return;
+
   }
+
 
   const inactiveTime =
-    Date.now() - Number(lastActivity);
+    Date.now() -
+    Number(lastActivity);
 
-  // Session expired
-  if (inactiveTime >= SESSION_TIMEOUT) {
 
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem(LAST_ACTIVITY_KEY);
+  // ================================
+  // 1-HOUR INACTIVITY EXPIRATION
+  // ================================
+
+  if (
+    inactiveTime >=
+    SESSION_TIMEOUT
+  ) {
+
+    clearCrmSession();
+
+    localStorage.removeItem(
+      SESSION_KEY
+    );
+
+    localStorage.removeItem(
+      LAST_ACTIVITY_KEY
+    );
 
     return;
+
   }
+
 
   try {
 
     const savedUser =
-      JSON.parse(savedSession);
+      JSON.parse(
+        savedSession
+      );
 
-    if (!savedUser || !savedUser.userId) {
+
+    if (
+      !savedUser ||
+      !savedUser.userId
+    ) {
+
+      clearLocalCrmLogin();
+
       return;
+
     }
-currentUser = savedUser;
 
-// Reload vehicle suggestions after refresh
-loadVehicleCatalog();
 
-showPortal(savedUser);
+    // ================================
+    // CHECK API EXPIRATION
+    // ================================
+
+    if (
+      savedUser.expiresAt
+    ) {
+
+      const expiresAt =
+        new Date(
+          savedUser.expiresAt
+        );
+
+
+      if (
+        !isNaN(
+          expiresAt.getTime()
+        ) &&
+        expiresAt.getTime() <=
+          Date.now()
+      ) {
+
+        clearLocalCrmLogin();
+
+        return;
+
+      }
+
+    }
+
+
+    currentUser =
+      savedUser;
+
+
+    // Reload vehicle suggestions
+    // after browser refresh.
+    loadVehicleCatalog();
+
+
+    showPortal(
+      savedUser
+    );
+
 
   } catch (error) {
 
@@ -208,15 +487,17 @@ showPortal(savedUser);
       error
     );
 
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem(LAST_ACTIVITY_KEY);
+
+    clearLocalCrmLogin();
+
   }
+
 }
 
 
-// =========================
+// ========================================
 // INACTIVITY SESSION TIMER
-// =========================
+// ========================================
 
 function updateLastActivity() {
 
@@ -224,18 +505,25 @@ function updateLastActivity() {
     return;
   }
 
+
   localStorage.setItem(
     LAST_ACTIVITY_KEY,
     Date.now().toString()
   );
+
 }
 
+
+// ========================================
+// CHECK SESSION TIMEOUT
+// ========================================
 
 function checkSessionTimeout() {
 
   if (!currentUser) {
     return;
   }
+
 
   const lastActivity =
     Number(
@@ -244,48 +532,71 @@ function checkSessionTimeout() {
       )
     );
 
+
   if (!lastActivity) {
     return;
   }
 
+
   const inactiveTime =
-    Date.now() - lastActivity;
+    Date.now() -
+    lastActivity;
 
-  if (inactiveTime >= SESSION_TIMEOUT) {
 
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem(LAST_ACTIVITY_KEY);
+  if (
+    inactiveTime >=
+    SESSION_TIMEOUT
+  ) {
 
     alert(
       "Your session expired due to 1 hour of inactivity."
     );
 
+
     logout();
+
   }
+
 }
 
 
-// User activity
+// ========================================
+// USER ACTIVITY
+// ========================================
+
 [
   "click",
   "keydown",
   "scroll",
   "touchstart"
-].forEach(function(eventName) {
+]
+.forEach(
+  function(eventName) {
 
-  document.addEventListener(
-    eventName,
-    updateLastActivity,
-    { passive: true }
-  );
+    document.addEventListener(
+      eventName,
+      updateLastActivity,
+      {
+        passive: true
+      }
+    );
 
-});
+  }
+);
 
 
-// Check inactivity every minute
+// ========================================
+// CHECK EVERY MINUTE
+// ========================================
+
 setInterval(
   checkSessionTimeout,
   60 * 1000
 );
-// Restore login when page loads
+
+
+// ========================================
+// RESTORE SESSION ON LOAD
+// ========================================
+
 restoreSession();
