@@ -1,4 +1,4 @@
-function loadLeads() {
+fasync function loadLeads() {
 
   if (!currentUser) {
     return;
@@ -17,54 +17,52 @@ function loadLeads() {
     </tr>
   `;
 
+  try {
 
-  google.script.run
+    const result =
+      await crmApi(
+        "getLeadsData"
+      );
 
-    .withSuccessHandler(function(result) {
-
-      if (!result || !result.success) {
-
-        body.innerHTML = `
-          <tr>
-            <td colspan="10" class="table-empty">
-              Unable to load leads.
-            </td>
-          </tr>
-        `;
-
-        return;
-      }
-
-
-      currentLeads =
-        result.leads || [];
-
-      filterLeadsTable();
-
-    })
-
-
-    .withFailureHandler(function(error) {
-
-      console.error(error);
+    if (
+      !result ||
+      !result.success
+    ) {
 
       body.innerHTML = `
         <tr>
           <td colspan="10" class="table-empty">
-            Unable to connect to the CRM.
+            Unable to load leads.
           </td>
         </tr>
       `;
 
-    })
+      return;
+    }
 
+    currentLeads =
+      result.leads || [];
 
-    .getLeadsData(
-      currentUser.userId
+    filterLeadsTable();
+
+  } catch (error) {
+
+    console.error(
+      "Unable to load leads:",
+      error
     );
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="10" class="table-empty">
+          Unable to connect to the CRM.
+        </td>
+      </tr>
+    `;
+
+  }
+
 }
-
-
 
 
 function filterLeadsTable() {
@@ -312,7 +310,7 @@ function buildLeadStatusOptions(currentStatus) {
     .join("");
 }
 
-function handleInlineStatusChange(
+async function handleInlineStatusChange(
   leadId,
   selectElement
 ) {
@@ -327,9 +325,6 @@ function handleInlineStatusChange(
   const oldStatus =
     selectElement.dataset.originalStatus;
 
-
-  // Booked needs appointment information,
-  // so use the full Edit form instead.
   if (newStatus === "Booked") {
 
     selectElement.value =
@@ -340,74 +335,80 @@ function handleInlineStatusChange(
     return;
   }
 
-
   selectElement.disabled = true;
 
+  try {
 
-  google.script.run
+    const result =
+      await crmApi(
+        "updateLead",
+        {
+          leadId: leadId,
 
-    .withSuccessHandler(function(result) {
-
-      selectElement.disabled = false;
-
-      if (!result || !result.success) {
-
-        selectElement.value =
-          oldStatus;
-
-        alert(
-          result && result.message
-            ? result.message
-            : "Unable to update status."
-        );
-
-        return;
-      }
-
-
-      selectElement.dataset.originalStatus =
-        newStatus;
-
-      // Keep local data synchronized
-      const lead =
-        currentLeads.find(function(item) {
-          return item.leadId === leadId;
-        });
-
-      if (lead) {
-        lead.status = newStatus;
-
-        if (newStatus !== "Booked") {
-          lead.appointmentDate = "";
-          lead.bookedBy = "";
+          leadData: {
+            status: newStatus
+          }
         }
-      }
+      );
 
-    })
+    selectElement.disabled = false;
 
+    if (
+      !result ||
+      !result.success
+    ) {
 
-    .withFailureHandler(function(error) {
-
-      selectElement.disabled = false;
       selectElement.value =
         oldStatus;
 
       alert(
-        "Unable to connect to the CRM."
+        result && result.message
+          ? result.message
+          : "Unable to update status."
       );
 
-      console.error(error);
+      return;
+    }
 
-    })
+    selectElement.dataset.originalStatus =
+      newStatus;
 
+    const lead =
+      currentLeads.find(
+        function(item) {
+          return item.leadId === leadId;
+        }
+      );
 
-    .updateLead(
-      currentUser.userId,
-      leadId,
-      {
-        status: newStatus
+    if (lead) {
+
+      lead.status =
+        newStatus;
+
+      if (newStatus !== "Booked") {
+
+        lead.appointmentDate = "";
+        lead.bookedBy = "";
+
       }
+
+    }
+
+  } catch (error) {
+
+    selectElement.disabled = false;
+
+    selectElement.value =
+      oldStatus;
+
+    alert(
+      "Unable to connect to the CRM."
     );
+
+    console.error(error);
+
+  }
+
 }
 
 function escapeJs(value) {
@@ -424,46 +425,41 @@ let vehicleCatalog = [];
 // LOAD VEHICLE CATALOG
 // =========================
 
-function loadVehicleCatalog() {
+async function loadVehicleCatalog() {
 
-  google.script.run
+  try {
 
-    .withSuccessHandler(
-      function(result) {
+    const result =
+      await crmApi(
+        "getVehiclesData"
+      );
 
-        if (
-          !result ||
-          !result.success
-        ) {
+    if (
+      !result ||
+      !result.success
+    ) {
 
-          console.error(
-            "Unable to load vehicles."
-          );
+      console.error(
+        "Unable to load vehicles.",
+        result
+      );
 
-          return;
-        }
+      return;
+    }
 
-        vehicleCatalog =
-          result.vehicles || [];
+    vehicleCatalog =
+      result.vehicles || [];
 
-      }
-    )
+  } catch (error) {
 
-    .withFailureHandler(
-      function(error) {
+    console.error(
+      "Vehicle catalog error:",
+      error
+    );
 
-        console.error(
-          "Vehicle catalog error:",
-          error
-        );
-
-      }
-    )
-
-    .getVehiclesData();
+  }
 
 }
-
 
 // =========================
 // SEARCH VEHICLE
@@ -743,7 +739,7 @@ function selectEditLeadVehicle(
 // ADD VEHICLE - EDIT LEAD
 // =========================
 
-function addEditLeadVehicle() {
+async function addEditLeadVehicle() {
 
   const input =
     document.getElementById(
@@ -755,10 +751,8 @@ function addEditLeadVehicle() {
       "editLeadVehicleSuggestions"
     );
 
-
   const vehicleName =
     input.value.trim();
-
 
   if (
     !vehicleName ||
@@ -767,94 +761,82 @@ function addEditLeadVehicle() {
     return;
   }
 
-
   container.innerHTML =
     '<div class="vehicle-suggestion-item">' +
     "Adding vehicle..." +
     "</div>";
 
+  try {
 
-  google.script.run
-
-    .withSuccessHandler(
-      function(result) {
-
-        if (
-          !result ||
-          !result.success
-        ) {
-
-          alert(
-            result &&
-            result.message
-              ? result.message
-              : "Unable to add vehicle."
-          );
-
-          return;
+    const result =
+      await crmApi(
+        "addVehicle",
+        {
+          vehicleName:
+            vehicleName
         }
+      );
 
+    if (
+      !result ||
+      !result.success
+    ) {
 
-        const savedVehicle =
-          result.vehicleName;
+      alert(
+        result && result.message
+          ? result.message
+          : "Unable to add vehicle."
+      );
 
+      return;
+    }
 
-        input.value =
-          savedVehicle;
+    const savedVehicle =
+      result.vehicleName;
 
+    input.value =
+      savedVehicle;
 
-        if (
-          !vehicleCatalog.some(
-            function(vehicle) {
+    if (
+      !vehicleCatalog.some(
+        function(vehicle) {
 
-              return vehicle
-                .toLowerCase() ===
-                savedVehicle
-                  .toLowerCase();
-
-            }
-          )
-        ) {
-
-          vehicleCatalog.push(
-            savedVehicle
-          );
-
-          vehicleCatalog.sort(
-            function(a, b) {
-
-              return a.localeCompare(b);
-
-            }
+          return (
+            vehicle.toLowerCase() ===
+            savedVehicle.toLowerCase()
           );
 
         }
+      )
+    ) {
 
+      vehicleCatalog.push(
+        savedVehicle
+      );
 
-        container.style.display =
-          "none";
+      vehicleCatalog.sort(
+        function(a, b) {
+          return a.localeCompare(b);
+        }
+      );
 
-        container.innerHTML = "";
+    }
 
-      }
-    )
+    container.style.display =
+      "none";
 
-    .withFailureHandler(
-      function(error) {
+    container.innerHTML =
+      "";
 
-        alert(
-          "Unable to add vehicle."
-        );
+  } catch (error) {
 
-        console.error(error);
-
-      }
-    )
-
-    .addVehicle(
-      vehicleName,
-      currentUser.userId
+    alert(
+      "Unable to add vehicle."
     );
+
+    console.error(error);
+
+  }
 
 }
 
@@ -862,7 +844,7 @@ function addEditLeadVehicle() {
 // ADD NEW VEHICLE
 // =========================
 
-function addNewLeadVehicle() {
+async function addNewLeadVehicle() {
 
   const input =
     document.getElementById(
@@ -874,10 +856,8 @@ function addNewLeadVehicle() {
       "newLeadVehicleSuggestions"
     );
 
-
   const vehicleName =
     input.value.trim();
-
 
   if (
     !vehicleName ||
@@ -886,97 +866,84 @@ function addNewLeadVehicle() {
     return;
   }
 
-
   container.innerHTML =
     '<div class="vehicle-suggestion-item">' +
     "Adding vehicle..." +
     "</div>";
 
+  try {
 
-  google.script.run
-
-    .withSuccessHandler(
-      function(result) {
-
-        if (
-          !result ||
-          !result.success
-        ) {
-
-          alert(
-            result &&
-            result.message
-              ? result.message
-              : "Unable to add vehicle."
-          );
-
-          return;
+    const result =
+      await crmApi(
+        "addVehicle",
+        {
+          vehicleName:
+            vehicleName
         }
+      );
 
+    if (
+      !result ||
+      !result.success
+    ) {
 
-        const savedVehicle =
-          result.vehicleName;
+      alert(
+        result && result.message
+          ? result.message
+          : "Unable to add vehicle."
+      );
 
+      return;
+    }
 
-        input.value =
-          savedVehicle;
+    const savedVehicle =
+      result.vehicleName;
 
+    input.value =
+      savedVehicle;
 
-        if (
-          !vehicleCatalog.some(
-            function(vehicle) {
+    if (
+      !vehicleCatalog.some(
+        function(vehicle) {
 
-              return vehicle
-                .toLowerCase() ===
-                savedVehicle
-                  .toLowerCase();
-
-            }
-          )
-        ) {
-
-          vehicleCatalog.push(
-            savedVehicle
-          );
-
-          vehicleCatalog.sort(
-            function(a, b) {
-
-              return a.localeCompare(b);
-
-            }
+          return (
+            vehicle.toLowerCase() ===
+            savedVehicle.toLowerCase()
           );
 
         }
+      )
+    ) {
 
+      vehicleCatalog.push(
+        savedVehicle
+      );
 
-        container.style.display =
-          "none";
+      vehicleCatalog.sort(
+        function(a, b) {
+          return a.localeCompare(b);
+        }
+      );
 
-        container.innerHTML = "";
+    }
 
-      }
-    )
+    container.style.display =
+      "none";
 
-    .withFailureHandler(
-      function(error) {
+    container.innerHTML =
+      "";
 
-        alert(
-          "Unable to add vehicle."
-        );
+  } catch (error) {
 
-        console.error(error);
-
-      }
-    )
-
-    .addVehicle(
-      vehicleName,
-      currentUser.userId
+    alert(
+      "Unable to add vehicle."
     );
 
-}
+    console.error(error);
 
+  }
+
+}
 
 // =========================
 // HELPERS
@@ -1070,100 +1037,143 @@ function toggleLeadAppointmentDate() {
 
 document
   .getElementById("addLeadForm")
-  .addEventListener("submit", function(event) {
+  .addEventListener(
+    "submit",
+    async function(event) {
 
-    event.preventDefault();
+      event.preventDefault();
 
-    if (!currentUser) {
-      return;
-    }
+      if (!currentUser) {
+        return;
+      }
 
-    const button =
-      document.getElementById("saveLeadButton");
+      const button =
+        document.getElementById(
+          "saveLeadButton"
+        );
 
-    const message =
-      document.getElementById("addLeadMessage");
+      const message =
+        document.getElementById(
+          "addLeadMessage"
+        );
 
-    const leadData = {
+      const leadData = {
 
-      customerName:
-        document
-          .getElementById("newLeadCustomerName")
-          .value
-          .trim(),
+        customerName:
+          document
+            .getElementById(
+              "newLeadCustomerName"
+            )
+            .value
+            .trim(),
 
-      contactNumber:
-        document
-          .getElementById("newLeadContactNumber")
-          .value
-          .trim(),
+        contactNumber:
+          document
+            .getElementById(
+              "newLeadContactNumber"
+            )
+            .value
+            .trim(),
 
-      vehicle:
-        document
-          .getElementById("newLeadVehicle")
-          .value
-          .trim(),
+        vehicle:
+          document
+            .getElementById(
+              "newLeadVehicle"
+            )
+            .value
+            .trim(),
 
-      year:
-        document
-          .getElementById("newLeadYear")
-          .value
-          .trim(),
+        year:
+          document
+            .getElementById(
+              "newLeadYear"
+            )
+            .value
+            .trim(),
 
-      plateNumber:
-        document
-          .getElementById("newLeadPlate")
-          .value
-          .trim(),
+        plateNumber:
+          document
+            .getElementById(
+              "newLeadPlate"
+            )
+            .value
+            .trim(),
 
-      branchId:
-        document
-          .getElementById("newLeadBranch")
-          .value,
+        branchId:
+          document
+            .getElementById(
+              "newLeadBranch"
+            )
+            .value,
 
-      inquirySource:
-        document
-          .getElementById("newLeadSource")
-          .value,
+        inquirySource:
+          document
+            .getElementById(
+              "newLeadSource"
+            )
+            .value,
 
-      service:
-        document
-          .getElementById("leadService")
-          .value,
+        service:
+          document
+            .getElementById(
+              "leadService"
+            )
+            .value,
 
-      status:
-        document
-          .getElementById("newLeadStatus")
-          .value,
+        status:
+          document
+            .getElementById(
+              "newLeadStatus"
+            )
+            .value,
 
-      concern:
-        document
-          .getElementById("newLeadConcern")
-          .value
-          .trim(),
+        concern:
+          document
+            .getElementById(
+              "newLeadConcern"
+            )
+            .value
+            .trim(),
 
-      appointmentDate:
-        document
-          .getElementById("newLeadAppointmentDate")
-          .value
-    };
+        appointmentDate:
+          document
+            .getElementById(
+              "newLeadAppointmentDate"
+            )
+            .value
 
-
-    message.className = "modal-message";
-    message.textContent = "";
-
-    button.disabled = true;
-    button.textContent = "SAVING...";
+      };
 
 
-    google.script.run
+      message.className =
+        "modal-message";
 
-      .withSuccessHandler(function(result) {
+      message.textContent =
+        "";
 
-        button.disabled = false;
-        button.textContent = "SAVE LEAD";
+      button.disabled =
+        true;
 
-        if (!result || !result.success) {
+      button.textContent =
+        "SAVING...";
+
+
+      try {
+
+        const result =
+          await crmApi(
+            "createLead",
+            {
+              leadData:
+                leadData
+            }
+          );
+
+
+        if (
+          !result ||
+          !result.success
+        ) {
 
           message.className =
             "modal-message error";
@@ -1189,19 +1199,17 @@ document
 
 
         // Close modal after short confirmation
-        setTimeout(function() {
+        setTimeout(
+          function() {
 
-          closeAddLeadModal();
+            closeAddLeadModal();
 
-        }, 700);
+          },
+          700
+        );
 
-      })
 
-
-      .withFailureHandler(function(error) {
-
-        button.disabled = false;
-        button.textContent = "SAVE LEAD";
+      } catch (error) {
 
         message.className =
           "modal-message error";
@@ -1211,16 +1219,19 @@ document
 
         console.error(error);
 
-      })
 
+      } finally {
 
-      .createLead(
-        currentUser.userId,
-        leadData
-      );
+        button.disabled =
+          false;
 
-  });
+        button.textContent =
+          "SAVE LEAD";
 
+      }
+
+    }
+  );
 function editLead(leadId) {
 
   try {
@@ -1411,206 +1422,267 @@ function formatDateForInput(value) {
 
 document
   .getElementById("editLeadForm")
-  .addEventListener("submit", function(event) {
+  .addEventListener(
+    "submit",
+    async function(event) {
 
-    event.preventDefault();
+      event.preventDefault();
 
-    if (!currentUser) {
-      return;
-    }
+      if (!currentUser) {
+        return;
+      }
 
-    const leadId =
-      document
-        .getElementById("editLeadId")
-        .value;
-
-    const button =
-      document.getElementById(
-        "updateLeadButton"
-      );
-
-    const message =
-      document.getElementById(
-        "editLeadMessage"
-      );
-
-
-    const updates = {
-
-      customerName:
+      const leadId =
         document
-          .getElementById("editLeadCustomerName")
-          .value
-          .trim(),
+          .getElementById(
+            "editLeadId"
+          )
+          .value;
 
-      contactNumber:
-        document
-          .getElementById("editLeadContactNumber")
-          .value
-          .trim(),
+      const button =
+        document.getElementById(
+          "updateLeadButton"
+        );
 
-      vehicle:
-        document
-          .getElementById("editLeadVehicle")
-          .value
-          .trim(),
-
-      year:
-        document
-          .getElementById("editLeadYear")
-          .value
-          .trim(),
-
-      plateNumber:
-        document
-          .getElementById("editLeadPlate")
-          .value
-          .trim(),
-
-      branchId:
-        document
-          .getElementById("editLeadBranch")
-          .value,
-
-      inquirySource:
-        document
-          .getElementById("editLeadSource")
-          .value,
-
-      service:
-        document
-          .getElementById("editLeadService")
-          .value,
-
-      status:
-        document
-          .getElementById("editLeadStatus")
-          .value,
-
-      assignedPm:
-        document
-          .getElementById("editLeadAssignedPm")
-          .value
-          .trim(),
-
-      bookedBy:
-        document
-          .getElementById("editLeadBookedBy")
-          .value
-          .trim(),
-
-      appointmentDate:
-        document
-          .getElementById("editLeadAppointmentDate")
-          .value,
-
-      appointmentTime:
-        document
-          .getElementById("editLeadAppointmentTime")
-          .value,
-
-      concern:
-        document
-          .getElementById("editLeadConcern")
-          .value
-          .trim()
-    };
+      const message =
+        document.getElementById(
+          "editLeadMessage"
+        );
 
 
-    // =========================
-    // CLIENT VALIDATION
-    // =========================
+      const updates = {
 
-    if (
-      (
-        updates.status === "Booked" ||
-        updates.status === "Rescheduled"
-      ) &&
-      !updates.appointmentDate
-    ) {
+        customerName:
+          document
+            .getElementById(
+              "editLeadCustomerName"
+            )
+            .value
+            .trim(),
+
+        contactNumber:
+          document
+            .getElementById(
+              "editLeadContactNumber"
+            )
+            .value
+            .trim(),
+
+        vehicle:
+          document
+            .getElementById(
+              "editLeadVehicle"
+            )
+            .value
+            .trim(),
+
+        year:
+          document
+            .getElementById(
+              "editLeadYear"
+            )
+            .value
+            .trim(),
+
+        plateNumber:
+          document
+            .getElementById(
+              "editLeadPlate"
+            )
+            .value
+            .trim(),
+
+        branchId:
+          document
+            .getElementById(
+              "editLeadBranch"
+            )
+            .value,
+
+        inquirySource:
+          document
+            .getElementById(
+              "editLeadSource"
+            )
+            .value,
+
+        service:
+          document
+            .getElementById(
+              "editLeadService"
+            )
+            .value,
+
+        status:
+          document
+            .getElementById(
+              "editLeadStatus"
+            )
+            .value,
+
+        assignedPm:
+          document
+            .getElementById(
+              "editLeadAssignedPm"
+            )
+            .value
+            .trim(),
+
+        bookedBy:
+          document
+            .getElementById(
+              "editLeadBookedBy"
+            )
+            .value
+            .trim(),
+
+        appointmentDate:
+          document
+            .getElementById(
+              "editLeadAppointmentDate"
+            )
+            .value,
+
+        appointmentTime:
+          document
+            .getElementById(
+              "editLeadAppointmentTime"
+            )
+            .value,
+
+        concern:
+          document
+            .getElementById(
+              "editLeadConcern"
+            )
+            .value
+            .trim()
+
+      };
+
+
+      // =========================
+      // CLIENT VALIDATION
+      // =========================
+
+      if (
+        (
+          updates.status === "Booked" ||
+          updates.status === "Rescheduled"
+        ) &&
+        !updates.appointmentDate
+      ) {
+
+        message.className =
+          "modal-message error";
+
+        message.textContent =
+          "Appointment Date is required.";
+
+        return;
+
+      }
+
+
+      // =========================
+      // SAVING STATE
+      // =========================
 
       message.className =
-        "modal-message error";
+        "modal-message";
 
       message.textContent =
-        "Appointment Date is required.";
+        "";
 
-      return;
+      button.disabled =
+        true;
+
+      button.textContent =
+        "SAVING...";
+
+
+      // =========================
+      // API
+      // =========================
+
+      try {
+
+        const result =
+          await crmApi(
+            "updateLead",
+            {
+              leadId:
+                leadId,
+
+              leadData:
+                updates
+            }
+          );
+
+
+        if (
+          !result ||
+          !result.success
+        ) {
+
+          message.className =
+            "modal-message error";
+
+          message.textContent =
+            result && result.message
+              ? result.message
+              : "Unable to update lead.";
+
+          return;
+
+        }
+
+
+        message.className =
+          "modal-message success";
+
+        message.textContent =
+          "Lead updated successfully.";
+
+
+        setTimeout(
+          function() {
+
+            closeEditLeadModal();
+
+            // Reload updated lead data
+            loadLeads();
+
+          },
+          500
+        );
+
+
+      } catch (error) {
+
+        message.className =
+          "modal-message error";
+
+        message.textContent =
+          error && error.message
+            ? error.message
+            : "Unable to update lead.";
+
+        console.error(error);
+
+
+      } finally {
+
+        button.disabled =
+          false;
+
+        button.textContent =
+          "SAVE CHANGES";
+
+      }
+
     }
-
-
-    // =========================
-    // SAVING STATE
-    // =========================
-
-    message.className =
-      "modal-message";
-
-    message.textContent = "";
-
-    button.disabled = true;
-    button.textContent = "SAVING...";
-
-
-    // =========================
-    // BACKEND
-    // =========================
-
-google.script.run
-
-  .withSuccessHandler(function(result) {
-
-    button.disabled = false;
-    button.textContent = "SAVE CHANGES";
-
-    if (!result || !result.success) {
-
-      message.className = "modal-message error";
-      message.textContent =
-        result && result.message
-          ? result.message
-          : "Unable to update lead.";
-
-      return;
-    }
-
-    message.className = "modal-message success";
-    message.textContent = "Lead updated successfully.";
-
-    setTimeout(function() {
-
-      closeEditLeadModal();
-
-      // Reload Leads so updated data appears immediately
-      loadLeads();
-
-    }, 500);
-
-  })
-
-  .withFailureHandler(function(error) {
-
-    button.disabled = false;
-    button.textContent = "SAVE CHANGES";
-
-    message.className = "modal-message error";
-    message.textContent =
-      error && error.message
-        ? error.message
-        : "Unable to update lead.";
-
-    console.error(error);
-
-  })
-
-  .updateLead(
-    currentUser.userId,
-    leadId,
-    updates
   );
-
-  });
-
 
   // =========================
 // REQUESTS MODULE
