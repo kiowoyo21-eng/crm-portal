@@ -1,238 +1,478 @@
 function showPortal(user) {
 
-      currentUser = user;
+  currentUser = user;
 
-      buildSidebar(user.systemRole);
+  buildSidebar(
+    user.systemRole
+  );
 
-      document
-        .getElementById("loginPage")
-        .style.display = "none";
 
-      document
-        .getElementById("portalPage")
-        .style.display = "block";
+  document
+    .getElementById("loginPage")
+    .style.display =
+    "none";
 
-      document
-        .getElementById("userName")
-        .textContent =
-        user.fullName || "User";
 
-      document
-        .getElementById("userRole")
-        .textContent =
-        user.systemRole || "—";
+  document
+    .getElementById("portalPage")
+    .style.display =
+    "block";
 
-      document
-        .getElementById("userBranch")
-        .textContent =
-        user.branchId || "—";
 
-      document
-        .getElementById("welcomeTitle")
-        .textContent =
-        "Welcome, " +
-        (user.fullName || "User");
+  document
+    .getElementById("userName")
+    .textContent =
+    user.fullName || "User";
 
-        updateDashboardInfo(user);
-        loadDashboardData(user.userId);
 
-    }
+  document
+    .getElementById("userRole")
+    .textContent =
+    user.systemRole || "—";
 
-function selectDashboardModule(moduleName) {
+
+  document
+    .getElementById("userBranch")
+    .textContent =
+    user.branchId || "—";
+
+
+  document
+    .getElementById("welcomeTitle")
+    .textContent =
+    "Welcome, " +
+    (user.fullName || "User");
+
+
+  updateDashboardInfo(
+    user
+  );
+
+
+  loadDashboardData();
+
+}
+
+
+// ========================================
+// DASHBOARD MODULE NAVIGATION
+// ========================================
+
+function selectDashboardModule(
+  moduleName
+) {
 
   const menuButtons =
-    document.querySelectorAll("#sidebarMenu .nav-item");
+    document.querySelectorAll(
+      "#sidebarMenu .nav-item"
+    );
 
-  for (let i = 0; i < menuButtons.length; i++) {
+
+  for (
+    let i = 0;
+    i < menuButtons.length;
+    i++
+  ) {
 
     if (
-      menuButtons[i].textContent.trim() ===
-      moduleName.replace(" 🎫", "")
+      menuButtons[i]
+        .textContent
+        .trim() ===
+      moduleName.replace(
+        " 🎫",
+        ""
+      )
     ) {
 
       selectModule(
-        menuButtons[i].textContent,
+        menuButtons[i]
+          .textContent,
         menuButtons[i]
       );
 
       return;
+
     }
+
   }
 
-  selectModule(moduleName, null);
+
+  selectModule(
+    moduleName,
+    null
+  );
+
 }
 
 
-function updateDashboardInfo(user) {
+// ========================================
+// DASHBOARD USER INFO
+// ========================================
+
+function updateDashboardInfo(
+  user
+) {
 
   document
-  .getElementById("dashboardRole").textContent =
+    .getElementById(
+      "dashboardRole"
+    )
+    .textContent =
     user.systemRole || "—";
 
-  document.getElementById("dashboardBranch").textContent =
+
+  document
+    .getElementById(
+      "dashboardBranch"
+    )
+    .textContent =
     user.branchId || "—";
 
-  const now = new Date();
 
-  document.getElementById("dashboardDate").textContent =
-    now.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric"
-    });
+  const now =
+    new Date();
 
-    
+
+  document
+    .getElementById(
+      "dashboardDate"
+    )
+    .textContent =
+    now.toLocaleDateString(
+      "en-US",
+      {
+        weekday:
+          "long",
+
+        month:
+          "long",
+
+        day:
+          "numeric",
+
+        year:
+          "numeric"
+      }
+    );
+
 }
 
-function loadDashboardData(userId) {
 
-  google.script.run
+// ========================================
+// LOAD DASHBOARD DATA
+// ========================================
 
-    .withSuccessHandler(function(result) {
+async function loadDashboardData() {
 
-      
+  try {
 
-      if (!result || !result.success) {
-        console.error(
-          "Dashboard data failed:",
-          result
-        );
-        return;
+    const result =
+      await crmApi(
+        "getDashboardData"
+      );
+
+
+    if (
+      !result ||
+      !result.success
+    ) {
+
+      console.error(
+        "Dashboard data failed:",
+        result
+      );
+
+
+      if (
+        result &&
+        (
+          result.message ===
+            "Invalid session." ||
+
+          result.message ===
+            "Session expired." ||
+
+          result.message ===
+            "Session token is required."
+        )
+      ) {
+
+        clearLocalCrmLogin();
+
       }
 
 
-      // =========================
-      // KPI
-      // =========================
+      return;
 
-      document
-        .getElementById("kpiInquiries")
-        .textContent =
+    }
+
+
+    // =========================
+    // KPI
+    // =========================
+
+    const kpiInquiries =
+      document.getElementById(
+        "kpiInquiries"
+      );
+
+
+    if (kpiInquiries) {
+
+      kpiInquiries.textContent =
         result.inquiriesToday || 0;
 
+    }
 
-      document
-        .getElementById("kpiAppointmentsCreated")
+
+    const kpiAppointmentsCreated =
+      document.getElementById(
+        "kpiAppointmentsCreated"
+      );
+
+
+    if (kpiAppointmentsCreated) {
+
+      kpiAppointmentsCreated
         .textContent =
-        result.appointmentsCreatedToday || 0;
+        result
+          .appointmentsCreatedToday ||
+        0;
 
-        document
-  .getElementById("kpiToFollowUp")
-  .textContent =
-  result.toFollowUpCount || 0;
-
-
-document
-  .getElementById("kpiToRemind")
-  .textContent =
-  result.toRemindCount || 0;
+    }
 
 
-      // =========================
-      // TODAY'S APPOINTMENTS
-      // =========================
+    const kpiToFollowUp =
+      document.getElementById(
+        "kpiToFollowUp"
+      );
 
-      document
-        .getElementById("todayAppointmentCount")
+
+    if (kpiToFollowUp) {
+
+      kpiToFollowUp.textContent =
+        result.toFollowUpCount || 0;
+
+    }
+
+
+    const kpiToRemind =
+      document.getElementById(
+        "kpiToRemind"
+      );
+
+
+    if (kpiToRemind) {
+
+      kpiToRemind.textContent =
+        result.toRemindCount || 0;
+
+    }
+
+
+    // =========================
+    // TODAY'S APPOINTMENTS
+    // =========================
+
+    const todayAppointmentCount =
+      document.getElementById(
+        "todayAppointmentCount"
+      );
+
+
+    if (todayAppointmentCount) {
+
+      todayAppointmentCount
         .textContent =
         result.appointmentsToday || 0;
 
+    }
 
-      document
-        .getElementById("todayConvertedCount")
+
+    const todayConvertedCount =
+      document.getElementById(
+        "todayConvertedCount"
+      );
+
+
+    if (todayConvertedCount) {
+
+      todayConvertedCount
         .textContent =
         result.convertedToday || 0;
 
+    }
 
-      document
-        .getElementById("todayConversionRate")
+
+    const todayConversionRate =
+      document.getElementById(
+        "todayConversionRate"
+      );
+
+
+    if (todayConversionRate) {
+
+      todayConversionRate
         .textContent =
-        (result.conversionRate || 0) + "%";
+        (
+          result.conversionRate || 0
+        ) + "%";
+
+    }
 
 
-      renderTodayAppointments(
-        result.todayAppointments || []
-      );
+    renderTodayAppointments(
+      result.todayAppointments || []
+    );
 
 
-      // =========================
-      // WEEKLY
-      // =========================
+    // =========================
+    // WEEKLY
+    // =========================
 
-      renderWeeklyAppointments(
-        result.weeklyAppointments || [],
-        result.weeklyLabels || []
-      );
-
-    })
+    renderWeeklyAppointments(
+      result.weeklyAppointments || [],
+      result.weeklyLabels || []
+    );
 
 
-    .withFailureHandler(function(error) {
+  } catch (error) {
 
-      console.error(
-        "Unable to load dashboard data:",
-        error
-      );
+    console.error(
+      "Unable to load dashboard data:",
+      error
+    );
 
-    })
+  }
 
-
-    .getDashboardData(userId);
 }
-function renderTodayAppointments(appointments) {
+
+
+// ========================================
+// RENDER TODAY'S APPOINTMENTS
+// ========================================
+
+function renderTodayAppointments(
+  appointments
+) {
 
   const container =
-    document.getElementById("todayAppointments");
+    document.getElementById(
+      "todayAppointments"
+    );
+
 
   if (!container) {
     return;
   }
 
-  if (!appointments || appointments.length === 0) {
+
+  if (
+    !appointments ||
+    appointments.length === 0
+  ) {
 
     container.innerHTML = `
-      <div class="empty-icon">—</div>
+      <div class="empty-icon">
+        —
+      </div>
+
       <div class="empty-title">
         No appointments today
       </div>
+
       <div class="empty-text">
-        No appointments are currently scheduled
-        for today.
+        No appointments are currently
+        scheduled for today.
       </div>
     `;
 
     return;
+
   }
+
 
   let html = `
     <div class="appointment-table">
-      <div class="appointment-row appointment-head">
-        <div>Customer</div>
-        <div>Vehicle</div>
-        <div>Branch</div>
-        <div>Status</div>
+
+      <div
+        class="
+          appointment-row
+          appointment-head
+        "
+      >
+
+        <div>
+          Customer
+        </div>
+
+        <div>
+          Vehicle
+        </div>
+
+        <div>
+          Branch
+        </div>
+
+        <div>
+          Status
+        </div>
+
       </div>
   `;
 
-  appointments.forEach(function(item) {
 
-    html += `
-      <div class="appointment-row">
-        <div>${escapeHtml(item.customerName || "—")}</div>
-        <div>${escapeHtml(item.vehicle || "—")}</div>
-        <div>${escapeHtml(item.branchId || "—")}</div>
-        <div>${escapeHtml(item.status || "—")}</div>
-      </div>
-    `;
+  appointments.forEach(
+    function(item) {
 
-  });
+      html += `
+        <div class="appointment-row">
 
-  html += `</div>`;
+          <div>
+            ${escapeHtml(
+              item.customerName || "—"
+            )}
+          </div>
 
-  container.innerHTML = html;
+          <div>
+            ${escapeHtml(
+              item.vehicle || "—"
+            )}
+          </div>
+
+          <div>
+            ${escapeHtml(
+              item.branchId || "—"
+            )}
+          </div>
+
+          <div>
+            ${escapeHtml(
+              item.status || "—"
+            )}
+          </div>
+
+        </div>
+      `;
+
+    }
+  );
+
+
+  html += `
+    </div>
+  `;
+
+
+  container.innerHTML =
+    html;
+
 }
 
+
+// ========================================
+// RENDER WEEKLY APPOINTMENTS
+// ========================================
 
 function renderWeeklyAppointments(
   values,
@@ -257,26 +497,35 @@ function renderWeeklyAppointments(
 
     const label =
       weekBoxes[i]
-        .querySelector(".week-label");
+        .querySelector(
+          ".week-label"
+        );
+
 
     const value =
       weekBoxes[i]
-        .querySelector("strong");
+        .querySelector(
+          "strong"
+        );
 
 
     if (label) {
+
       label.textContent =
         labels[i] || "—";
+
     }
 
 
     if (value) {
+
       value.textContent =
         values[i] || 0;
+
     }
 
 
-    // Build the actual date for this day
+    // Build actual date
     const date =
       new Date(
         today.getFullYear(),
@@ -291,24 +540,31 @@ function renderWeeklyAppointments(
       );
 
 
-    weekBoxes[i].classList.add(
-      "week-day-clickable"
-    );
+    weekBoxes[i]
+      .classList
+      .add(
+        "week-day-clickable"
+      );
 
 
-weekBoxes[i].onclick =
-  function() {
+    weekBoxes[i].onclick =
+      function() {
 
-    openDashboardAppointmentPopup(
-      dateKey,
-      labels[i] || ""
-    );
+        openDashboardAppointmentPopup(
+          dateKey,
+          labels[i] || ""
+        );
 
-  };
+      };
 
   }
 
 }
+
+
+// ========================================
+// OPEN PM REMINDER QUEUE
+// ========================================
 
 function openPMReminderQueue() {
 
@@ -317,29 +573,37 @@ function openPMReminderQueue() {
       "#sidebarMenu .nav-item"
     );
 
-  let appointmentsButton = null;
+
+  let appointmentsButton =
+    null;
 
 
   menuButtons.forEach(
     function(button) {
 
       if (
-        String(button.textContent || "")
-          .trim() === "Appointments"
+        String(
+          button.textContent || ""
+        )
+          .trim() ===
+        "Appointments"
       ) {
 
-        appointmentsButton = button;
+        appointmentsButton =
+          button;
 
       }
 
     }
   );
 
+
   setTimeout(
     function() {
 
       const tomorrow =
         new Date();
+
 
       tomorrow.setDate(
         tomorrow.getDate() + 1
@@ -352,7 +616,6 @@ function openPMReminderQueue() {
         );
 
 
-      // Move calendar to tomorrow's month
       appointmentCalendarDate =
         new Date(
           tomorrow.getFullYear(),
@@ -364,8 +627,6 @@ function openPMReminderQueue() {
       renderAppointmentsCalendar();
 
 
-      // Open the same date popup
-      // used when clicking the calendar.
       openAppointmentDate(
         tomorrowKey
       );
@@ -376,19 +637,27 @@ function openPMReminderQueue() {
 
 }
 
-function openDashboardAppointmentPopup(
+
+// ========================================
+// DASHBOARD WEEKLY APPOINTMENT POPUP
+// ========================================
+
+async function openDashboardAppointmentPopup(
   dateKey,
   label
 ) {
 
-  // REMOVE OLD POPUP
+  // Remove old popup
   const oldModal =
     document.getElementById(
       "dashboardAppointmentModal"
     );
 
+
   if (oldModal) {
+
     oldModal.remove();
+
   }
 
 
@@ -397,7 +666,10 @@ function openDashboardAppointmentPopup(
   // =========================
 
   const modal =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   modal.id =
     "dashboardAppointmentModal";
@@ -429,11 +701,14 @@ function openDashboardAppointmentPopup(
 
 
   // =========================
-  // BOX
+  // MODAL BOX
   // =========================
 
   const box =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   box.style.background =
     "#111";
@@ -467,10 +742,17 @@ function openDashboardAppointmentPopup(
       .toLocaleDateString(
         "en-US",
         {
-          weekday: "long",
-          month: "long",
-          day: "numeric",
-          year: "numeric"
+          weekday:
+            "long",
+
+          month:
+            "long",
+
+          day:
+            "numeric",
+
+          year:
+            "numeric"
         }
       );
 
@@ -499,12 +781,15 @@ function openDashboardAppointmentPopup(
           APPOINTMENTS
         </div>
 
+
         <h3
           style="
             margin:0;
           "
         >
-          ${escapeHtml(displayDate)}
+          ${escapeHtml(
+            displayDate
+          )}
         </h3>
 
       </div>
@@ -539,9 +824,14 @@ function openDashboardAppointmentPopup(
   `;
 
 
-  modal.appendChild(box);
+  modal.appendChild(
+    box
+  );
 
-  document.body.appendChild(modal);
+
+  document.body.appendChild(
+    modal
+  );
 
 
   // =========================
@@ -560,20 +850,17 @@ function openDashboardAppointmentPopup(
     };
 
 
-  // =========================
-  // USER CHECK
-  // =========================
-
   const body =
     document.getElementById(
       "dashboardAppointmentModalBody"
     );
 
 
-  if (
-    !currentUser ||
-    !currentUser.userId
-  ) {
+  // =========================
+  // SESSION CHECK
+  // =========================
+
+  if (!currentUser) {
 
     body.innerHTML = `
       <div
@@ -592,192 +879,220 @@ function openDashboardAppointmentPopup(
 
 
   // =========================
-  // LOAD APPOINTMENTS
+  // LOAD THROUGH API
   // =========================
 
-  google.script.run
+  try {
 
-    .withSuccessHandler(
-      function(result) {
-
-        if (
-          !result ||
-          !result.success
-        ) {
-
-          body.innerHTML = `
-            <div
-              style="
-                padding:30px;
-                text-align:center;
-              "
-            >
-              Unable to load appointments.
-            </div>
-          `;
-
-          return;
-
-        }
+    const result =
+      await crmApi(
+        "getAppointmentsData"
+      );
 
 
-        const appointments =
-          (
-            result.appointments || []
-          )
-            .filter(
-              function(item) {
+    if (
+      !result ||
+      !result.success
+    ) {
 
-                return (
-                  String(
-                    item.appointmentDate || ""
-                  ).trim() ===
-                  dateKey
-                );
-
-              }
-            );
-
-
-        if (
-          appointments.length === 0
-        ) {
-
-          body.innerHTML = `
-            <div
-              style="
-                padding:35px;
-                text-align:center;
-                opacity:.7;
-              "
-            >
-              No appointments scheduled
-              for this date.
-            </div>
-          `;
-
-          return;
-
-        }
+      body.innerHTML = `
+        <div
+          style="
+            padding:30px;
+            text-align:center;
+          "
+        >
+          Unable to load appointments.
+        </div>
+      `;
 
 
-        let html = "";
+      if (
+        result &&
+        (
+          result.message ===
+            "Invalid session." ||
+
+          result.message ===
+            "Session expired." ||
+
+          result.message ===
+            "Session token is required."
+        )
+      ) {
+
+        clearLocalCrmLogin();
+
+      }
 
 
-        appointments.forEach(
+      return;
+
+    }
+
+
+    const appointments =
+      (
+        result.appointments || []
+      )
+        .filter(
           function(item) {
 
-            html += `
-
-              <div
-                style="
-                  padding:16px;
-                  margin-bottom:10px;
-                  border:1px solid
-                    rgba(255,255,255,.08);
-                  border-radius:12px;
-                "
-              >
-
-                <div
-                  style="
-                    display:flex;
-                    justify-content:space-between;
-                    gap:15px;
-                    margin-bottom:8px;
-                  "
-                >
-
-                  <strong>
-                    ${escapeHtml(
-                      item.customerName ||
-                      "—"
-                    )}
-                  </strong>
-
-                  <span>
-                    ${escapeHtml(
-                      item.appointmentTime ||
-                      "—"
-                    )}
-                  </span>
-
-                </div>
-
-
-                <div
-                  style="
-                    display:flex;
-                    flex-wrap:wrap;
-                    gap:10px;
-                    font-size:13px;
-                    opacity:.75;
-                  "
-                >
-
-                  <span>
-                    ${escapeHtml(
-                      item.vehicle ||
-                      "—"
-                    )}
-                  </span>
-
-                  <span>
-                    ${escapeHtml(
-                      item.branchId ||
-                      "—"
-                    )}
-                  </span>
-
-                  <span>
-                    ${escapeHtml(
-                      item.status ||
-                      "—"
-                    )}
-                  </span>
-
-                </div>
-
-              </div>
-            `;
+            return (
+              String(
+                item.appointmentDate ||
+                ""
+              )
+                .trim() ===
+              dateKey
+            );
 
           }
         );
 
 
-        body.innerHTML =
-          html;
+    if (
+      appointments.length === 0
+    ) {
 
-      }
-    )
+      body.innerHTML = `
+        <div
+          style="
+            padding:35px;
+            text-align:center;
+            opacity:.7;
+          "
+        >
+          No appointments scheduled
+          for this date.
+        </div>
+      `;
 
-    .withFailureHandler(
-      function(error) {
+      return;
 
-        console.error(
-          "Dashboard weekly popup error:",
-          error
-        );
+    }
 
-        body.innerHTML = `
+
+    let html = "";
+
+
+    appointments.forEach(
+      function(item) {
+
+        html += `
+
           <div
             style="
-              padding:30px;
-              text-align:center;
+              padding:16px;
+              margin-bottom:10px;
+              border:
+                1px solid
+                rgba(255,255,255,.08);
+              border-radius:12px;
             "
           >
-            Unable to load appointments.
+
+            <div
+              style="
+                display:flex;
+                justify-content:
+                  space-between;
+                gap:15px;
+                margin-bottom:8px;
+              "
+            >
+
+              <strong>
+                ${escapeHtml(
+                  item.customerName ||
+                  "—"
+                )}
+              </strong>
+
+
+              <span>
+                ${escapeHtml(
+                  item.appointmentTime ||
+                  "—"
+                )}
+              </span>
+
+            </div>
+
+
+            <div
+              style="
+                display:flex;
+                flex-wrap:wrap;
+                gap:10px;
+                font-size:13px;
+                opacity:.75;
+              "
+            >
+
+              <span>
+                ${escapeHtml(
+                  item.vehicle ||
+                  "—"
+                )}
+              </span>
+
+
+              <span>
+                ${escapeHtml(
+                  item.branchId ||
+                  "—"
+                )}
+              </span>
+
+
+              <span>
+                ${escapeHtml(
+                  item.status ||
+                  "—"
+                )}
+              </span>
+
+            </div>
+
           </div>
         `;
 
       }
-    )
-
-    .getAppointmentsData(
-      currentUser.userId
     );
 
+
+    body.innerHTML =
+      html;
+
+
+  } catch (error) {
+
+    console.error(
+      "Dashboard weekly popup error:",
+      error
+    );
+
+
+    body.innerHTML = `
+      <div
+        style="
+          padding:30px;
+          text-align:center;
+        "
+      >
+        Unable to load appointments.
+      </div>
+    `;
+
+  }
+
 }
+
+
+// ========================================
+// CLOSE DASHBOARD POPUP
+// ========================================
 
 function closeDashboardAppointmentPopup() {
 
@@ -786,9 +1101,11 @@ function closeDashboardAppointmentPopup() {
       "dashboardAppointmentModal"
     );
 
+
   if (modal) {
-    modal.style.display =
-      "none";
+
+    modal.remove();
+
   }
 
 }
