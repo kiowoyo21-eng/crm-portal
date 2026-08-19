@@ -1,4 +1,4 @@
-function loadRequests() {
+async function loadRequests() {
 
   const tableBody =
     document.getElementById(
@@ -20,41 +20,17 @@ function loadRequests() {
     </tr>
   `;
 
+  try {
 
-  google.script.run
+    const result =
+      await crmApi(
+        "getRequestsData"
+      );
 
-    .withSuccessHandler(function(result) {
-
-      if (!result || !result.success) {
-
-        tableBody.innerHTML = `
-          <tr>
-            <td
-              colspan="8"
-              class="table-empty"
-            >
-              Unable to load requests.
-            </td>
-          </tr>
-        `;
-
-        return;
-      }
-
-
-      currentRequests =
-        result.requests || [];
-
-
-      renderRequestsKPIs();
-
-      renderRequestsTable();
-
-    })
-
-    .withFailureHandler(function(error) {
-
-      console.error(error);
+    if (
+      !result ||
+      !result.success
+    ) {
 
       tableBody.innerHTML = `
         <tr>
@@ -67,15 +43,37 @@ function loadRequests() {
         </tr>
       `;
 
-    })
+      return;
+    }
 
-    .getRequestsData(
-      currentUser.userId
+    currentRequests =
+      result.requests || [];
+
+    renderRequestsKPIs();
+
+    renderRequestsTable();
+
+  } catch (error) {
+
+    console.error(
+      "Unable to load requests:",
+      error
     );
 
+    tableBody.innerHTML = `
+      <tr>
+        <td
+          colspan="8"
+          class="table-empty"
+        >
+          Unable to load requests.
+        </td>
+      </tr>
+    `;
+
+  }
+
 }
-
-
 // =========================
 // REQUEST KPI
 // =========================
@@ -475,7 +473,9 @@ function closeNewRequestModal() {
 
 }
 
-function submitNewRequest(event) {
+async function submitNewRequest(
+  event
+) {
 
   event.preventDefault();
 
@@ -528,7 +528,8 @@ function submitNewRequest(event) {
   };
 
 
-  button.disabled = true;
+  button.disabled =
+    true;
 
   button.textContent =
     "SUBMITTING...";
@@ -540,85 +541,82 @@ function submitNewRequest(event) {
     "";
 
 
-  google.script.run
+  try {
 
-    .withSuccessHandler(
-      function(result) {
-
-        button.disabled = false;
-
-        button.textContent =
-          "SUBMIT REQUEST";
-
-
-        if (
-          !result ||
-          !result.success
-        ) {
-
-          message.className =
-            "modal-message error";
-
-          message.textContent =
-            result &&
-            result.message
-              ? result.message
-              : "Unable to submit request.";
-
-          return;
+    const result =
+      await crmApi(
+        "createRequest",
+        {
+          requestData:
+            requestData
         }
+      );
 
 
-        message.className =
-          "modal-message success";
+    if (
+      !result ||
+      !result.success
+    ) {
 
-        message.textContent =
-          "Request submitted successfully.";
+      message.className =
+        "modal-message error";
+
+      message.textContent =
+        result &&
+        result.message
+          ? result.message
+          : "Unable to submit request.";
+
+      return false;
+    }
 
 
-        setTimeout(
-          function() {
+    message.className =
+      "modal-message success";
 
-            closeNewRequestModal();
+    message.textContent =
+      "Request submitted successfully.";
 
-            loadRequests();
 
-          },
-          500
-        );
+    setTimeout(
+      function() {
 
-      }
-    )
+        closeNewRequestModal();
 
-    .withFailureHandler(
-      function(error) {
+        loadRequests();
 
-        button.disabled = false;
-
-        button.textContent =
-          "SUBMIT REQUEST";
-
-        message.className =
-          "modal-message error";
-
-        message.textContent =
-          error &&
-          error.message
-            ? error.message
-            : "Unable to submit request.";
-
-        console.error(error);
-
-      }
-    )
-
-    .createRequest(
-      currentUser.userId,
-      requestData
+      },
+      500
     );
 
 
+  } catch (error) {
+
+    message.className =
+      "modal-message error";
+
+    message.textContent =
+      error &&
+      error.message
+        ? error.message
+        : "Unable to submit request.";
+
+    console.error(error);
+
+
+  } finally {
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "SUBMIT REQUEST";
+
+  }
+
+
   return false;
+
 }
 
 
