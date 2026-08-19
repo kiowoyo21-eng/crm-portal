@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<base target="_top"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+<link href="styles.css" rel="stylesheet"/></head>
+<body>
+<!-- =========================
+       LOGIN PAGE
+       ========================= -->
+<div id="loginPage">
+<div class="login-wrapper">
+<div class="login-card">
+<div class="brand">
+<div class="brand-title">
+            CRM PORTAL
+          </div>
+<div class="brand-line"></div>
+</div>
+<form id="loginForm">
+<div class="form-group">
+<label for="username">
+              Username
+            </label>
+<input autocomplete="username" id="username" placeholder="Enter username" required="" type="text"/>
+</div>
+<div class="form-group">
+<label for="password">
+              Password
+            </label>
+<input autocomplete="current-password" id="password" placeholder="Enter password" required="" type="password"/>
+</div>
+<button class="login-button" id="loginButton" type="submit">
+            LOGIN
+          </button>
+</form>
+<div class="loading" id="loading">
+          Signing in...
+        </div>
+<div class="message" id="message"></div>
+</div>
+</div>
+</div>
+<!-- =========================
+       CRM PORTAL PAGE
+       ========================= -->
+<div id="portalPage">
+<div class="portal-layout">
+<!-- SIDEBAR -->
+<aside class="sidebar">
+<div class="sidebar-brand">
+<div class="sidebar-brand-title">
+            CRM PORTAL
+          </div>
+<div class="sidebar-brand-subtitle">
+            Management System
+          </div>
+</div>
+<div class="nav-section-title">
+  Main Menu
+</div>
+<div id="sidebarMenu"></div>
+<div class="sidebar-bottom">
+<button class="nav-item support-button" onclick="selectModule('Support 🎫', this)">
+    Support 🎫
+  </button>
+<button class="nav-item logout-button" onclick="logout()">
+    Logout
+  </button>
+</div>
+</aside>
+<!-- MAIN CONTENT -->
+<main class="main-content">
+<header class="topbar">
+<div class="page-title" id="pageTitle">
+            Dashboard
+          </div>
+<div class="user-info">
+<div>
+<div class="user-name" id="userName">
+                —
+              </div>
+<div class="user-role" id="userRole">
+                —
+              </div>
+</div>
+<div class="branch-badge" id="userBranch">
+              —
+            </div>
+</div>
+</header>
+<section class="content-area">
+<div id="dashboardView">
+<div class="dashboard-header">
+<div>
+<div class="dashboard-eyebrow">
+        CRM PORTAL
+      </div>
+<div class="welcome-title" id="welcomeTitle">
+        Welcome
+      </div>
+<div class="welcome-text">
+        Here's your current workspace overview.
+      </div>
+</div>
+<div class="dashboard-date" id="dashboardDate">
+      —
+    </div>
+</div>
+<!-- PM DASHBOARD KPI CARDS -->
+<div class="kpi-grid pm-kpi-grid">
+<div class="kpi-card">
+<div class="kpi-top">
+<span class="kpi-label">
+        TOTAL INQUIRIES TODAY
+      </span>
+<span class="kpi-icon">
+        I
+      </span>
+</div>
+<div class="kpi-value" id="kpiInquiries">
+      0
+    </div>
+<div class="kpi-subtext">
+      New inquiries created today
+    </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-top">
+<span class="kpi-label">
+        TOTAL APPOINTMENTS CREATED
+      </span>
+<span class="kpi-icon">
+        A
+      </span>
+</div>
+<div class="kpi-value" id="kpiAppointmentsCreated">
+      0
+    </div>
+<div class="kpi-subtext">
+      Appointments booked today
+    </div>
+</div>
+<div class="kpi-card kpi-card-clickable" onclick="openPMFollowUpQueue()" role="button" tabindex="0">
+<div class="kpi-top">
+<span class="kpi-label">
+        TO FOLLOW UP
+      </span>
+<span class="kpi-icon">
+        F
+      </span>
+</div>
+<div class="kpi-value" id="kpiToFollowUp">
+      0
+    </div>
+<div class="kpi-subtext">
+      Leads that need follow-up
+    </div>
+</div>
+<div class="kpi-card kpi-card-clickable" onclick="openPMReminderQueue()" role="button" tabindex="0">
+<div class="kpi-top">
+<span class="kpi-label">
+        TO REMIND
+      </span>
+<span class="kpi-icon">
+        R
+      </span>
+</div>
+<div class="kpi-value" id="kpiToRemind">
+      0
+    </div>
+<div class="kpi-subtext">
+      Tomorrow's appointments
+    </div>
+</div>
+</div>
+<!-- TODAY'S APPOINTMENTS -->
+<div class="dashboard-panel">
+<div class="panel-header">
+<div>
+<div class="panel-title">
+        Today's Appointments
+      </div>
+<div class="panel-subtitle">
+        Scheduled appointments and conversion performance
+      </div>
+</div>
+<button class="panel-action" onclick="selectDashboardModule('Appointments')">
+      VIEW ALL
+    </button>
+</div>
+<!-- SUMMARY -->
+<div class="appointment-summary">
+<div class="appointment-summary-item">
+<span>
+        TODAY'S APPOINTMENTS
+      </span>
+<strong id="todayAppointmentCount">
+        0
+      </strong>
+</div>
+<div class="appointment-summary-item">
+<span>
+        CONVERTED
+      </span>
+<strong id="todayConvertedCount">
+        0
+      </strong>
+</div>
+<div class="appointment-summary-item">
+<span>
+        CONVERSION RATE
+      </span>
+<strong id="todayConversionRate">
+        0%
+      </strong>
+</div>
+</div>
+<!-- APPOINTMENT LIST -->
+<div class="empty-state" id="todayAppointments">
+<div class="empty-icon">
+      —
+    </div>
+<div class="empty-title">
+      No appointments today
+    </div>
+<div class="empty-text">
+      No appointments are currently scheduled for today.
+    </div>
+</div>
+</div>
+<!-- APPOINTMENT WEEKLY -->
+<div class="dashboard-panel weekly-panel">
+<div class="panel-header">
+<div>
+<div class="panel-title">
+        Appointment Weekly
+      </div>
+<div class="panel-subtitle">
+        Today through the next 6 days
+      </div>
+</div>
+</div>
+<div class="weekly-grid">
+<div class="week-day">
+<div class="week-label">—</div>
+<strong>0</strong>
+</div>
+<div class="week-day">
+<div class="week-label">—</div>
+<strong>0</strong>
+</div>
+<div class="week-day">
+<div class="week-label">—</div>
+<strong>0</strong>
+</div>
+<div class="week-day">
+<div class="week-label">—</div>
+<strong>0</strong>
+</div>
+<div class="week-day">
+<div class="week-label">—</div>
+<strong>0</strong>
+</div>
+<div class="week-day">
+<div class="week-label">—</div>
+<strong>0</strong>
+</div>
+<div class="week-day">
+<div class="week-label">—</div>
+<strong>0</strong>
+</div>
+</div>
+</div>
+<!-- ACCESS INFORMATION -->
+<div class="access-strip">
+<div>
+<span class="access-label">
+        ACCESS LEVEL
+      </span>
+<strong id="dashboardRole">
+        —
+      </strong>
+</div>
+<div>
+<span class="access-label">
+        BRANCH
+      </span>
+<strong id="dashboardBranch">
+        —
+      </strong>
+</div>
+<div>
+<span class="access-label">
+        STATUS
+      </span>
+<strong class="status-active">
+        ACTIVE
+      </strong>
+</div>
+</div>
+</div>
+<!-- =========================
+     APPOINTMENTS VIEW
+     ========================= -->
+<div id="appointmentsView" style="display:none;">
+<!-- HEADER -->
+<div class="module-header">
+<div>
+<div class="dashboard-eyebrow">
+        APPOINTMENTS
+      </div>
+<div class="module-title">
+        Appointment Calendar
+      </div>
+<div class="module-subtitle">
+        View scheduled appointments by date and branch.
+      </div>
+</div>
+</div>
+<!-- CALENDAR CARD -->
+<div class="calendar-card">
+<!-- CALENDAR TOOLBAR -->
+<div class="calendar-toolbar">
+<div class="calendar-navigation">
+<button class="calendar-nav-button" onclick="changeAppointmentMonth(-1)" type="button">
+          ← PREVIOUS
+        </button>
+<button class="calendar-today-button" onclick="goToAppointmentToday()" type="button">
+          TODAY
+        </button>
+<button class="calendar-nav-button" onclick="changeAppointmentMonth(1)" type="button">
+          NEXT →
+        </button>
+</div>
+<div class="calendar-month-title" id="appointmentCalendarTitle">
+        —
+      </div>
+</div>
+<!-- DAYS OF WEEK -->
+<div class="calendar-weekdays">
+<div>SUN</div>
+<div>MON</div>
+<div>TUE</div>
+<div>WED</div>
+<div>THU</div>
+<div>FRI</div>
+<div>SAT</div>
+</div>
+<!-- CALENDAR -->
+<div class="calendar-grid" id="appointmentCalendarGrid">
+<div class="calendar-empty" style="grid-column: 1 / -1;">
+        Select Appointments to load calendar.
+      </div>
+</div>
+</div>
+<!-- =========================
+       SELECTED DATE PANEL
+       ========================= -->
+<!-- =========================
+     APPOINTMENT DATE MODAL
+     ========================= -->
+<div class="appointment-modal-overlay" id="selectedAppointmentDatePanel" onclick="handleAppointmentModalBackdrop(event)" style="display:none;">
+<div class="appointment-modal" onclick="event.stopPropagation()">
+<div class="appointment-modal-header">
+<div>
+<div class="dashboard-eyebrow">
+          DAILY APPOINTMENTS
+        </div>
+<div class="appointment-modal-title" id="selectedAppointmentDateTitle">
+          —
+        </div>
+</div>
+<button class="appointment-modal-close" onclick="closeAppointmentDatePanel()" type="button">
+        ×
+      </button>
+</div>
+<div class="appointment-modal-content" id="selectedAppointmentDateContent">
+<div class="calendar-empty">
+        No appointments scheduled.
+      </div>
+</div>
+</div>
+</div>
+<!-- KEEP THIS: closes appointmentsView -->
+</div>
+<!-- =========================
+     REPORTS VIEW
+     ========================= -->
+<div id="reportsView" style="display:none;">
+<div class="module-header">
+<div>
+<div class="dashboard-eyebrow">
+        PM ANALYTICS
+      </div>
+<div class="module-title">
+        Reports
+      </div>
+<div class="module-subtitle">
+        Review lead, booking, conversion, follow-up, and commission performance.
+      </div>
+</div>
+</div>
+<!-- =========================
+       REPORT FILTERS
+       ========================= -->
+<div class="report-filter-bar">
+<div class="form-group">
+<label>Start Date</label>
+<input id="reportStartDate" type="date"/>
+</div>
+<div class="form-group">
+<label>End Date</label>
+<input id="reportEndDate" type="date"/>
+</div>
+<div class="form-group">
+<label>Branch</label>
+<select id="reportBranchFilter">
+<option value="ALL">
+          All Branches
+        </option>
+<option value="UC-LP">
+          UC Las Piñas
+        </option>
+<option value="UC-MD">
+          UC Mandaluyong
+        </option>
+<option value="UC-QC">
+          UC Quezon City
+        </option>
+<option value="MM-MD">
+          Mastermind Mandaluyong
+        </option>
+</select>
+</div>
+<button class="primary-action report-apply-button" onclick="loadPMReports()" type="button">
+      APPLY
+    </button>
+</div>
+<!-- =========================
+       REPORT KPI CARDS
+       ========================= -->
+<div class="kpi-grid reports-kpi-grid">
+<div class="kpi-card">
+<div class="kpi-label">
+        TOTAL INQUIRIES
+      </div>
+<div class="kpi-value" id="reportTotalInquiries">
+        0
+      </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">
+        TOTAL BOOKED
+      </div>
+<div class="kpi-value" id="reportTotalBooked">
+        0
+      </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">
+        INQUIRY → BOOK
+      </div>
+<div class="kpi-value" id="reportInquiryToBook">
+        0%
+      </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">
+        TOTAL CONVERTED
+      </div>
+<div class="kpi-value" id="reportTotalConverted">
+        0
+      </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">
+        BOOK → CONVERT
+      </div>
+<div class="kpi-value" id="reportBookToConvert">
+        0%
+      </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">
+        INQUIRY → CONVERT
+      </div>
+<div class="kpi-value" id="reportInquiryToConvert">
+        0%
+      </div>
+</div>
+</div>
+<!-- =========================
+       APPOINTMENT OUTCOMES
+       ========================= -->
+<div class="report-section collapsible-report">
+<button class="report-toggle" onclick="toggleReportSection(
+        'reportAppointmentOutcomesBody',
+        this
+      )" type="button">
+<span>Appointment Outcomes</span>
+<span class="report-toggle-icon">
+        ▾
+      </span>
+</button>
+<div class="report-collapsible-body" id="reportAppointmentOutcomesBody" style="display:none;">
+<div class="report-table-container" id="reportAppointmentOutcomes"></div>
+</div>
+</div>
+<!-- =========================
+       BRANCH PERFORMANCE
+       ========================= -->
+<div class="report-section collapsible-report">
+<button class="report-toggle" onclick="toggleReportSection(
+        'reportBranchPerformanceBody',
+        this
+      )" type="button">
+<span>Branch Performance</span>
+<span class="report-toggle-icon">
+        ▾
+      </span>
+</button>
+<div class="report-collapsible-body" id="reportBranchPerformanceBody" style="display:none;">
+<div class="report-table-container" id="reportBranchPerformance"></div>
+</div>
+</div>
+<!-- =========================
+       INQUIRY SOURCE PERFORMANCE
+       ========================= -->
+<div class="report-section collapsible-report">
+<button class="report-toggle" onclick="toggleReportSection(
+        'reportSourcePerformanceBody',
+        this
+      )" type="button">
+<span>Inquiry Source Performance</span>
+<span class="report-toggle-icon">
+        ▾
+      </span>
+</button>
+<div class="report-collapsible-body" id="reportSourcePerformanceBody" style="display:none;">
+<div class="report-table-container" id="reportSourcePerformance"></div>
+</div>
+</div>
+<!-- =========================
+       PM PERFORMANCE
+       ========================= -->
+<div class="report-section collapsible-report">
+<button class="report-toggle" onclick="toggleReportSection(
+        'reportPMPerformanceBody',
+        this
+      )" type="button">
+<span>PM Performance</span>
+<span class="report-toggle-icon">
+        ▾
+      </span>
+</button>
+<div class="report-collapsible-body" id="reportPMPerformanceBody" style="display:none;">
+<div class="report-table-container" id="reportPMPerformance"></div>
+</div>
+</div>
+<!-- =========================
+       BOOKED BY PERFORMANCE
+       ========================= -->
+<div class="report-section collapsible-report">
+<button class="report-toggle" onclick="toggleReportSection(
+        'reportBookedByPerformanceBody',
+        this
+      )" type="button">
+<span>Booked By Performance</span>
+<span class="report-toggle-icon">
+        ▾
+      </span>
+</button>
+<div class="report-collapsible-body" id="reportBookedByPerformanceBody" style="display:none;">
+<div class="report-table-container" id="reportBookedByPerformance"></div>
+</div>
+</div>
+<!-- =========================
+       COMMISSION REPORT
+       ========================= -->
+<div class="report-section collapsible-report">
+<button class="report-toggle" onclick="toggleReportSection(
+        'reportCommissionBody',
+        this
+      )" type="button">
+<span>Commission Report</span>
+<span class="report-toggle-icon">
+        ▾
+      </span>
+</button>
+<div class="report-collapsible-body" id="reportCommissionBody" style="display:none;">
+<div class="commission-summary">
+<div>
+<span>Rate per Conversion</span>
+<strong id="reportCommissionRate">
+            ₱0
+          </strong>
+</div>
+<div>
+<span>Total Conversions</span>
+<strong id="reportCommissionConversions">
+            0
+          </strong>
+</div>
+<div>
+<span>Total Commission</span>
+<strong id="reportTotalCommission">
+            ₱0
+          </strong>
+</div>
+</div>
+<div class="report-table-container" id="reportCommissionTable"></div>
+</div>
+</div>
+<!-- =========================
+       FOLLOW-UP REPORT
+       ========================= -->
+<div class="report-section collapsible-report">
+<button class="report-toggle" onclick="toggleReportSection(
+        'reportFollowUpBody',
+        this
+      )" type="button">
+<span>Follow-Up Report</span>
+<span class="report-toggle-icon">
+        ▾
+      </span>
+</button>
+<div class="report-collapsible-body" id="reportFollowUpBody" style="display:none;">
+<div class="report-table-container" id="reportFollowUp"></div>
+</div>
+</div>
+<!-- =========================
+       VEHICLE INSIGHTS
+       ========================= -->
+<div class="report-section collapsible-report">
+<button class="report-toggle" onclick="toggleReportSection(
+        'reportVehicleInsightsBody',
+        this
+      )" type="button">
+<span>Vehicle Insights</span>
+<span class="report-toggle-icon">
+        ▾
+      </span>
+</button>
+<div class="report-collapsible-body" id="reportVehicleInsightsBody" style="display:none;">
+<div class="report-table-container" id="reportVehicleInsights"></div>
+</div>
+</div>
+</div>
+<!-- =========================
+     REQUESTS VIEW
+     ========================= -->
+<div id="requestsView" style="display:none;">
+<div class="module-header">
+<div>
+<div class="dashboard-eyebrow">
+        PAGE MANAGER
+      </div>
+<div class="module-title">
+        Requests
+      </div>
+<div class="module-subtitle">
+        Create and monitor your submitted requests.
+      </div>
+</div>
+<button class="primary-action" onclick="openNewRequestModal()" type="button">
+      + NEW REQUEST
+    </button>
+</div>
+<!-- KPI -->
+<div class="kpi-grid">
+<div class="kpi-card">
+<div class="kpi-label">
+        PENDING
+      </div>
+<div class="kpi-value" id="requestPendingCount">
+        0
+      </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">
+        IN PROGRESS
+      </div>
+<div class="kpi-value" id="requestInProgressCount">
+        0
+      </div>
+</div>
+<div class="kpi-card">
+<div class="kpi-label">
+        RESOLVED
+      </div>
+<div class="kpi-value" id="requestResolvedCount">
+        0
+      </div>
+</div>
+</div>
+<!-- REQUEST TABLE -->
+<div class="leads-table-card">
+<div class="table-scroll">
+<table class="crm-table">
+<thead>
+<tr>
+<th>Request ID</th>
+<th>Type</th>
+<th>Subject</th>
+<th>Priority</th>
+<th>Status</th>
+<th>Created</th>
+<th>Updated By</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="requestsTableBody">
+<tr>
+<td class="table-empty" colspan="8">
+              Select Requests to load records.
+            </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- =========================
+     LEADS VIEW
+     ========================= -->
+<div id="leadsView" style="display:none;">
+<div class="module-header">
+<div>
+<div class="dashboard-eyebrow">
+        PAGE MANAGER
+      </div>
+<div class="module-title">
+        Leads
+      </div>
+<div class="module-subtitle">
+        Manage customer inquiries across all branches.
+      </div>
+</div>
+<button class="primary-action" onclick="openAddLeadModal()">
+      + ADD LEAD
+    </button>
+</div>
+<!-- =========================
+     ADD LEAD MODAL
+     ========================= -->
+<div class="crm-modal" id="addLeadModal">
+<div class="crm-modal-backdrop" onclick="closeAddLeadModal()">
+</div>
+<div class="crm-modal-card">
+<div class="crm-modal-header">
+<div>
+<div class="dashboard-eyebrow">
+          PAGE MANAGER
+        </div>
+<div class="crm-modal-title">
+          Add New Lead
+        </div>
+<div class="crm-modal-subtitle">
+          Create a customer inquiry record.
+        </div>
+</div>
+<button class="modal-close" onclick="closeAddLeadModal()" type="button">
+        ×
+      </button>
+</div>
+<!-- =========================
+     EDIT LEAD MODAL
+     ========================= -->
+<form id="addLeadForm">
+<div class="lead-form-section-title">
+        Customer Information
+      </div>
+<div class="lead-form-grid">
+<div class="form-group">
+<label>Customer Name *</label>
+<input id="newLeadCustomerName" placeholder="Enter customer name" required="" type="text"/>
+</div>
+<div class="form-group">
+<label>Contact Number *</label>
+<input id="newLeadContactNumber" placeholder="09XXXXXXXXX" required="" type="text"/>
+</div>
+<div class="form-group vehicle-search-group">
+<label>Vehicle Make / Model *</label>
+<div class="vehicle-search-wrapper">
+<input autocomplete="off" id="newLeadVehicle" onfocus="searchNewLeadVehicle()" oninput="searchNewLeadVehicle()" placeholder="Search vehicle..." required="" type="text"/>
+<div class="vehicle-suggestions" id="newLeadVehicleSuggestions" style="display:none;"></div>
+</div>
+</div>
+<div class="form-group">
+<label>Year</label>
+<input id="newLeadYear" max="2100" min="1900" placeholder="e.g. 2022" type="number"/>
+</div>
+<div class="form-group">
+<label>Plate Number</label>
+<input id="newLeadPlate" placeholder="Enter plate number" type="text"/>
+</div>
+</div>
+<div class="lead-form-section-title">
+        Lead Information
+      </div>
+<div class="lead-form-grid">
+<div class="form-group">
+<label>Branch *</label>
+<select class="form-select" id="newLeadBranch" required="">
+<option value="">
+              Select branch
+            </option>
+<option value="UC-LP">
+              UC Las Piñas
+            </option>
+<option value="UC-MD">
+              UC Mandaluyong
+            </option>
+<option value="UC-QC">
+              UC Quezon City
+            </option>
+<option value="MM-MD">
+              Mastermind Mandaluyong
+            </option>
+</select>
+</div>
+<div class="form-group">
+<label>Inquiry Source</label>
+<select class="form-select" id="newLeadSource">
+<option value="">
+              Select source
+            </option>
+<option value="Facebook">
+              Facebook
+            </option>
+<option value="Messenger">
+              Messenger
+            </option>
+<option value="Walk-in">
+              Walk-in
+            </option>
+<option value="Call">
+              Call
+            </option>
+<option value="Referral">
+              Referral
+            </option>
+<option value="Other">
+              Other
+            </option>
+</select>
+</div>
+<div class="form-group">
+<label>Service *</label>
+<select class="form-select" id="leadService" required="">
+<option value="">
+      Select service
+    </option>
+<option value="Overall / Vehicle System Checkup">
+      Overall / Vehicle System Checkup
+    </option>
+<option value="Aircon Checkup">
+      Aircon Checkup
+    </option>
+<option value="PMS Checkup">
+      PMS Checkup
+    </option>
+<option value="Computer Diagnostic Scan">
+      Computer Diagnostic Scan
+    </option>
+<option value="Auto Electrical">
+      Auto Electrical
+    </option>
+<option value="EGR Cleaning / Service">
+      EGR Cleaning / Service
+    </option>
+<option value="ATF / Transmission Fluid Service">
+      ATF / Transmission Fluid Service
+    </option>
+<option value="Preventive Maintenance Service (PMS)">
+      Preventive Maintenance Service (PMS)
+    </option>
+<option value="Change Oil">
+      Change Oil
+    </option>
+<option value="Parts Replacement">
+      Parts Replacement
+    </option>
+<option value="Underchassis / Suspension Checkup">
+      Underchassis / Suspension Checkup
+    </option>
+<option value="Brake Checkup / Repair">
+      Brake Checkup / Repair
+    </option>
+<option value="Engine Checkup / Repair">
+      Engine Checkup / Repair
+    </option>
+<option value="Cooling System / Overheating Checkup">
+      Cooling System / Overheating Checkup
+    </option>
+<option value="Steering Checkup / Repair">
+      Steering Checkup / Repair
+    </option>
+<option value="Battery / Charging System">
+      Battery / Charging System
+    </option>
+<option value="Fuel System Service">
+      Fuel System Service
+    </option>
+<option value="Transmission / Drivetrain Checkup">
+      Transmission / Drivetrain Checkup
+    </option>
+<option value="Tune-Up">
+      Tune-Up
+    </option>
+<option value="Engine Overhaul / Major Repair">
+      Engine Overhaul / Major Repair
+    </option>
+<option value="Aircon Repair / Maintenance">
+      Aircon Repair / Maintenance
+    </option>
+<option value="Suspension / Underchassis Repair">
+      Suspension / Underchassis Repair
+    </option>
+<option value="Electrical Repair">
+      Electrical Repair
+    </option>
+<option value="Diagnostic / Error Code Concern">
+      Diagnostic / Error Code Concern
+    </option>
+<option value="General Mechanical Concern">
+      General Mechanical Concern
+    </option>
+<option value="Others">
+      Others
+    </option>
+</select>
+</div>
+<div class="form-group">
+<label>Status *</label>
+<select class="form-select" id="newLeadStatus" onchange="toggleLeadAppointmentDate()" required="">
+<option value="Interested">
+              Interested
+            </option>
+<option value="Follow Up">
+              Follow Up
+            </option>
+<option value="Not Interested">
+              Not Interested
+            </option>
+<option value="Booked">
+              Booked
+            </option>
+<option value="Cancelled">
+              Cancelled
+            </option>
+<option value="Rescheduled">
+              Rescheduled
+            </option>
+<option value="No Show">
+              No Show
+            </option>
+</select>
+</div>
+<div class="form-group" id="newLeadAppointmentGroup" style="display:none;">
+<label>Appointment Date *</label>
+<input id="newLeadAppointmentDate" type="date"/>
+</div>
+</div>
+<div class="form-group">
+<label>
+          Concern / Additional Details
+        </label>
+<textarea class="form-textarea" id="newLeadConcern" placeholder="Enter customer's concern or additional details..."></textarea>
+</div>
+<div class="modal-message" id="addLeadMessage"></div>
+<div class="crm-modal-footer">
+<button class="secondary-action" onclick="closeAddLeadModal()" type="button">
+          CANCEL
+        </button>
+<button class="primary-action" id="saveLeadButton" type="submit">
+          SAVE LEAD
+        </button>
+</div>
+</form>
+</div>
+</div>
+<div class="module-toolbar">
+<input class="module-search" id="leadSearch" oninput="filterLeadsTable()" placeholder="Search customer, contact, vehicle or plate..." type="text"/>
+<select class="module-filter" id="leadBranchFilter" onchange="filterLeadsTable()">
+<option value="">All Branches</option>
+<option value="UC-LP">UC Las Piñas</option>
+<option value="UC-MD">UC Mandaluyong</option>
+<option value="UC-QC">UC Quezon City</option>
+<option value="MM-MD">Mastermind Mandaluyong</option>
+</select>
+<select class="module-filter" id="leadStatusFilter" onchange="filterLeadsTable()">
+<option value="">All Statuses</option>
+<option value="Interested">Interested</option>
+<option value="Follow Up">Follow Up</option>
+<option value="Not Interested">Not Interested</option>
+<option value="Booked">Booked</option>
+<option value="Remind">Remind</option>
+<option value="Cancelled">Cancelled</option>
+<option value="Rescheduled">Rescheduled</option>
+<option value="No Show">No Show</option>
+</select>
+</div>
+<!-- SERVICE FILTER - DITO ILALAGAY -->
+<div class="filter-group">
+<label>Service</label>
+<select class="form-select" id="leadServiceFilter" onchange="filterLeadsTable()">
+<option value="">All Services</option>
+<!-- service options dito -->
+</select>
+</div>
+<div class="leads-table-card">
+<div class="table-scroll">
+<table class="crm-table">
+<thead>
+<tr>
+<th>Customer</th>
+<th>Vehicle</th>
+<th>Branch</th>
+<th>Source</th>
+<th>Service</th>
+<th>Concern</th>
+<th>Status</th>
+<th>Assigned PM</th>
+<th>Appointment</th>
+<th>Created</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="leadsTableBody">
+<tr>
+<td class="table-empty" colspan="10">
+              Select Leads to load records.
+            </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</div>
+<div class="crm-modal" id="editLeadModal">
+<div class="crm-modal-backdrop" onclick="closeEditLeadModal()"></div>
+<div class="crm-modal-card">
+<div class="crm-modal-header">
+<div>
+<div class="dashboard-eyebrow">
+          PAGE MANAGER
+        </div>
+<div class="crm-modal-title">
+          Edit Lead
+        </div>
+<div class="crm-modal-subtitle" id="editLeadIdDisplay">
+          —
+        </div>
+</div>
+<button class="modal-close" onclick="closeEditLeadModal()" type="button">
+        ×
+      </button>
+</div>
+<form id="editLeadForm">
+<input id="editLeadId" type="hidden"/>
+<div class="lead-form-section-title">
+        Customer Information
+      </div>
+<div class="lead-form-grid">
+<div class="form-group">
+<label>Customer Name *</label>
+<input id="editLeadCustomerName" required="" type="text"/>
+</div>
+<div class="form-group">
+<label>Contact Number *</label>
+<input id="editLeadContactNumber" required="" type="text"/>
+</div>
+<div class="form-group vehicle-search-group">
+<label>Vehicle Make / Model *</label>
+<div class="vehicle-search-wrapper">
+<input autocomplete="off" id="editLeadVehicle" onfocus="searchEditLeadVehicle()" oninput="searchEditLeadVehicle()" placeholder="Search vehicle..." required="" type="text"/>
+<div class="vehicle-suggestions" id="editLeadVehicleSuggestions" style="display:none;"></div>
+</div>
+</div>
+<div class="form-group">
+<label>Year</label>
+<input id="editLeadYear" max="2100" min="1900" type="number"/>
+</div>
+<div class="form-group">
+<label>Plate Number</label>
+<input id="editLeadPlate" type="text"/>
+</div>
+</div>
+<div class="lead-form-section-title">
+        Lead Information
+      </div>
+<div class="lead-form-grid">
+<div class="form-group">
+<label>Branch *</label>
+<select class="form-select" id="editLeadBranch" required="">
+<option value="UC-LP">
+              UC Las Piñas
+            </option>
+<option value="UC-MD">
+              UC Mandaluyong
+            </option>
+<option value="UC-QC">
+              UC Quezon City
+            </option>
+<option value="MM-MD">
+              Mastermind Mandaluyong
+            </option>
+</select>
+</div>
+<div class="form-group">
+<label>Inquiry Source</label>
+<select class="form-select" id="editLeadSource">
+<option value="">—</option>
+<option value="Facebook">Facebook</option>
+<option value="Messenger">Messenger</option>
+<option value="Walk-in">Walk-in</option>
+<option value="Call">Call</option>
+<option value="Referral">Referral</option>
+<option value="Other">Other</option>
+</select>
+</div>
+<div class="form-group">
+<label>Service *</label>
+<select class="form-select" id="editLeadService" required="">
+<option value="">Select service</option>
+<option value="Overall / Vehicle System Checkup">Overall / Vehicle System Checkup</option>
+<option value="Aircon Checkup">Aircon Checkup</option>
+<option value="PMS Checkup">PMS Checkup</option>
+<option value="Computer Diagnostic Scan">Computer Diagnostic Scan</option>
+<option value="Auto Electrical">Auto Electrical</option>
+<option value="EGR Cleaning / Service">EGR Cleaning / Service</option>
+<option value="ATF / Transmission Fluid Service">ATF / Transmission Fluid Service</option>
+<option value="Preventive Maintenance Service (PMS)">Preventive Maintenance Service (PMS)</option>
+<option value="Change Oil">Change Oil</option>
+<option value="Parts Replacement">Parts Replacement</option>
+<option value="Underchassis / Suspension Checkup">Underchassis / Suspension Checkup</option>
+<option value="Brake Checkup / Repair">Brake Checkup / Repair</option>
+<option value="Engine Checkup / Repair">Engine Checkup / Repair</option>
+<option value="Cooling System / Overheating Checkup">Cooling System / Overheating Checkup</option>
+<option value="Steering Checkup / Repair">Steering Checkup / Repair</option>
+<option value="Battery / Charging System">Battery / Charging System</option>
+<option value="Fuel System Service">Fuel System Service</option>
+<option value="Transmission / Drivetrain Checkup">Transmission / Drivetrain Checkup</option>
+<option value="Tune-Up">Tune-Up</option>
+<option value="Engine Overhaul / Major Repair">Engine Overhaul / Major Repair</option>
+<option value="Aircon Repair / Maintenance">Aircon Repair / Maintenance</option>
+<option value="Suspension / Underchassis Repair">Suspension / Underchassis Repair</option>
+<option value="Electrical Repair">Electrical Repair</option>
+<option value="Diagnostic / Error Code Concern">Diagnostic / Error Code Concern</option>
+<option value="General Mechanical Concern">General Mechanical Concern</option>
+<option value="Others">Others</option>
+</select>
+</div>
+<div class="form-group">
+<label>Status *</label>
+<select class="form-select" id="editLeadStatus" onchange="toggleEditLeadAppointmentDate()" required="">
+<option value="Interested">Interested</option>
+<option value="Follow Up">Follow Up</option>
+<option value="Not Interested">Not Interested</option>
+<option value="Booked">Booked</option>
+<option value="Remind">Remind</option>
+<option value="Cancelled">Cancelled</option>
+<option value="Rescheduled">Rescheduled</option>
+<option value="No Show">No Show</option>
+</select>
+</div>
+<div class="form-group">
+<label>Assigned PM</label>
+<input id="editLeadAssignedPm" type="text"/>
+</div>
+<div class="form-group" id="editLeadAppointmentGroup" style="display:none;">
+<label>Appointment Date *</label>
+<input id="editLeadAppointmentDate" type="date"/>
+</div>
+<div class="form-group" id="editLeadAppointmentTimeGroup" style="display:none;">
+<label>Appointment Time *</label>
+<input id="editLeadAppointmentTime" type="time"/>
+</div>
+<div class="form-group" id="editLeadBookedByGroup" style="display:none;">
+<label>Booked By</label>
+<input id="editLeadBookedBy" readonly="" type="text"/>
+</div>
+</div>
+<div class="form-group">
+<label>
+          Concern / Additional Details
+        </label>
+<textarea class="form-textarea" id="editLeadConcern"></textarea>
+</div>
+<div class="modal-message" id="editLeadMessage"></div>
+<div class="crm-modal-footer">
+<button class="secondary-action" onclick="closeEditLeadModal()" type="button">
+          CANCEL
+        </button>
+<button class="primary-action" id="updateLeadButton" type="submit">
+          SAVE CHANGES
+        </button>
+</div>
+</form>
+</div>
+</div>
+
+<!-- =========================
+     APPOINTMENT DETAILS MODAL
+     ========================= -->
+<div class="appointment-details-overlay" id="appointmentDetailsModal" onclick="
+    if (event.target === this) {
+      closeAppointmentDetailsModal();
+    }
+  " style="display:none;">
+<div class="appointment-details-modal">
+<!-- HEADER -->
+<div class="appointment-details-header">
+<div>
+<div class="dashboard-eyebrow">
+          APPOINTMENT DETAILS
+        </div>
+<div class="appointment-details-title">
+          Customer Appointment
+        </div>
+<div class="appointment-details-id" id="appointmentDetailsId">
+          —
+        </div>
+</div>
+<button class="appointment-modal-close" onclick="closeAppointmentDetailsModal()" type="button">
+        ×
+      </button>
+</div>
+<!-- BODY -->
+<div class="appointment-details-body">
+<!-- CUSTOMER -->
+<div class="appointment-details-section">
+<div class="appointment-details-section-title">
+          CUSTOMER INFORMATION
+        </div>
+<div class="appointment-details-grid">
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              CUSTOMER NAME
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsCustomer">
+              —
+            </div>
+</div>
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              CONTACT NUMBER
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsContact">
+              —
+            </div>
+</div>
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              VEHICLE
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsVehicle">
+              —
+            </div>
+</div>
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              SERVICE
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsService">
+              —
+            </div>
+</div>
+</div>
+</div>
+<!-- SCHEDULE -->
+<div class="appointment-details-section">
+<div class="appointment-details-section-title">
+          APPOINTMENT SCHEDULE
+        </div>
+<div class="appointment-details-grid">
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              BRANCH
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsBranch">
+              —
+            </div>
+</div>
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              DATE
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsDate">
+              —
+            </div>
+</div>
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              TIME
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsTime">
+              —
+            </div>
+</div>
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              STATUS
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsStatus">
+              —
+            </div>
+</div>
+</div>
+</div>
+<!-- RECORD -->
+<div class="appointment-details-section">
+<div class="appointment-details-section-title">
+          RECORD INFORMATION
+        </div>
+<div class="appointment-details-grid">
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              ASSIGNED PM
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsAssignedPm">
+              —
+            </div>
+</div>
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              BOOKED BY
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsBookedBy">
+              —
+            </div>
+</div>
+<div class="appointment-detail-field">
+<div class="appointment-detail-label">
+              LAST UPDATED BY
+            </div>
+<div class="appointment-detail-value" id="appointmentDetailsUpdatedBy">
+              —
+            </div>
+</div>
+</div>
+</div>
+</div>
+<!-- FOOTER -->
+<div class="appointment-details-footer">
+<button class="secondary-action" onclick="closeAppointmentDetailsModal()" type="button">
+        CLOSE
+      </button>
+</div>
+</div>
+</div>
+<!-- =========================
+     REQUEST DETAILS MODAL
+     ========================= -->
+<div class="crm-modal" id="requestDetailsModal">
+<div class="crm-modal-backdrop" onclick="closeRequestDetails()"></div>
+<div class="crm-modal-card">
+<div class="crm-modal-header">
+<div>
+<div class="dashboard-eyebrow">
+          REQUEST DETAILS
+        </div>
+<div class="crm-modal-title" id="requestDetailsTitle">
+          —
+        </div>
+<div class="crm-modal-subtitle" id="requestDetailsId">
+          —
+        </div>
+</div>
+<button class="modal-close" onclick="closeRequestDetails()" type="button">
+        ×
+      </button>
+</div>
+<div style="padding:24px;">
+<div class="lead-form-grid">
+<div class="form-group">
+<label>Request Type</label>
+<div id="requestDetailsType">
+            —
+          </div>
+</div>
+<div class="form-group">
+<label>Priority</label>
+<div id="requestDetailsPriority">
+            —
+          </div>
+</div>
+<div class="form-group">
+<label>Status</label>
+<div id="requestDetailsStatus">
+            —
+          </div>
+</div>
+<div class="form-group">
+<label>Branch</label>
+<div id="requestDetailsBranch">
+            —
+          </div>
+</div>
+<div class="form-group">
+<label>Created</label>
+<div id="requestDetailsCreated">
+            —
+          </div>
+</div>
+<div class="form-group">
+<label>Created By</label>
+<div id="requestDetailsCreatedBy">
+    —
+  </div>
+</div>
+</div>
+<div class="form-group">
+<label>Description</label>
+<div id="requestDetailsDescription" style="
+            white-space:pre-wrap;
+            line-height:1.6;
+          ">
+          —
+        </div>
+</div>
+<div id="requestResolutionSection" style="display:none;">
+<div class="lead-form-grid">
+<div class="form-group">
+<label>Resolved By</label>
+<div id="requestDetailsResolvedBy">
+              —
+            </div>
+</div>
+<div class="form-group">
+<label>Resolved At</label>
+<div id="requestDetailsResolvedAt">
+              —
+            </div>
+</div>
+</div>
+</div>
+<div class="crm-modal-footer">
+<button class="secondary-action" onclick="closeRequestDetails()" type="button">
+          CLOSE
+        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- =========================
+     NEW REQUEST MODAL
+     ========================= -->
+<div class="crm-modal" id="newRequestModal">
+<div class="crm-modal-backdrop" onclick="closeNewRequestModal()"></div>
+<div class="crm-modal-card">
+<div class="crm-modal-header">
+<div>
+<div class="dashboard-eyebrow">
+          PAGE MANAGER
+        </div>
+<div class="crm-modal-title">
+          New Request
+        </div>
+<div class="crm-modal-subtitle">
+          Submit a request for review and tracking.
+        </div>
+</div>
+<button class="modal-close" onclick="closeNewRequestModal()" type="button">
+        ×
+      </button>
+</div>
+<form id="newRequestForm" onsubmit="submitNewRequest(event)">
+<div style="padding:24px;">
+<div class="lead-form-grid">
+<div class="form-group">
+<label>
+              Request Type *
+            </label>
+<select class="form-select" id="newRequestType" required="">
+<option value="">
+    Select request type
+  </option>
+<option value="Leave Request">
+    Leave Request
+  </option>
+<option value="Schedule Change">
+    Schedule Change
+  </option>
+<option value="Attendance / DTR Dispute">
+    Attendance / DTR Dispute
+  </option>
+<option value="Overtime / Pay Concern">
+    Overtime / Pay Concern
+  </option>
+<option value="Complaint / Grievance">
+    Complaint / Grievance
+  </option>
+<option value="Workplace Concern">
+    Workplace Concern
+  </option>
+<option value="Employee Information Change">
+    Employee Information Change
+  </option>
+<option value="Branch / Assignment Change">
+    Branch / Assignment Change
+  </option>
+<option value="Document / Certificate Request">
+    Document / Certificate Request
+  </option>
+<option value="Others">
+    Others
+  </option>
+</select>
+<div class="form-group">
+<label>
+              Priority *
+            </label>
+<select class="form-select" id="newRequestPriority" required="">
+<option value="Normal">
+                Normal
+              </option>
+<option value="Low">
+                Low
+              </option>
+<option value="High">
+                High
+              </option>
+<option value="Urgent">
+                Urgent
+              </option>
+</select>
+</div>
+</div>
+<div class="form-group">
+<label>
+            Subject *
+          </label>
+<input id="newRequestSubject" placeholder="Enter request subject" required="" type="text"/>
+</div>
+<div class="form-group">
+<label>
+            Description *
+          </label>
+<textarea class="form-textarea" id="newRequestDescription" placeholder="Describe the request..." required=""></textarea>
+</div>
+<div class="modal-message" id="newRequestMessage"></div>
+<div class="crm-modal-footer">
+<button class="secondary-action" onclick="closeNewRequestModal()" type="button">
+            CANCEL
+          </button>
+<button class="primary-action" id="saveRequestButton" type="submit">
+            SUBMIT REQUEST
+          </button>
+</div>
+</div>
+</div></form>
+</div>
+</div>
+<!-- =========================
+     DASHBOARD APPOINTMENT POPUP
+========================= -->
+<div id="dashboardAppointmentModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    background:rgba(0,0,0,.72);
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  ">
+<div style="
+      width:min(720px, 100%);
+      max-height:80vh;
+      overflow:auto;
+      background:#111;
+      border:1px solid rgba(212,175,55,.35);
+      border-radius:18px;
+      padding:22px;
+    ">
+<div style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:20px;
+        margin-bottom:20px;
+      ">
+<h3 id="dashboardAppointmentModalTitle" style="margin:0;">
+        Appointments
+      </h3>
+<button class="secondary-action" onclick="closeDashboardAppointmentPopup()" type="button">
+        CLOSE
+      </button>
+</div>
+<div class="dashboard-appointment-list" id="dashboardAppointmentModalBody"></div>
+</div>
+</div>
+<script src="config.js"></script><script src="utils.js"></script><script src="auth.js"></script><script src="dashboard.js"></script><script src="reports.js"></script><script src="navigation.js"></script><script src="appointments.js"></script><script src="leads.js"></script><script src="requests.js"></script></body>
+
+</html>
