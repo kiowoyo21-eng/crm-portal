@@ -2,56 +2,71 @@ const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwDmJGpj37YWOvP5gGbw-ARe1WuZG3H1cOYWVByhPnVjFv4dXxRXu8UFR2yQ1xVUIBJ/exec";
 
 
-module.exports = async function handler(
-  req,
-  res
-) {
+module.exports = async function handler(req, res) {
 
   try {
 
     // =========================
-    // GET = HEALTH CHECK
+    // HEALTH CHECK
     // =========================
 
     if (req.method === "GET") {
 
       const response =
         await fetch(
-          APPS_SCRIPT_URL +
-          "?action=ping",
+          APPS_SCRIPT_URL,
           {
+            method: "GET",
             redirect: "follow"
           }
         );
 
-
       const text =
         await response.text();
 
+      res.setHeader(
+        "Content-Type",
+        "application/json; charset=utf-8"
+      );
 
-      res
-        .status(200)
-        .setHeader(
-          "Content-Type",
-          "application/json"
-        )
-        .setHeader(
-          "Cache-Control",
-          "no-store"
-        )
+      res.setHeader(
+        "Cache-Control",
+        "no-store"
+      );
+
+      return res
+        .status(response.status)
         .send(text);
-
-
-      return;
-
     }
 
 
     // =========================
-    // POST = CRM API
+    // CRM POST
     // =========================
 
     if (req.method === "POST") {
+
+      let payload = req.body;
+
+
+      // Make sure payload is an object
+      if (typeof payload === "string") {
+
+        try {
+          payload =
+            JSON.parse(payload);
+        } catch (error) {
+
+          return res
+            .status(400)
+            .json({
+              success: false,
+              message:
+                "Invalid CRM request body."
+            });
+        }
+      }
+
 
       const response =
         await fetch(
@@ -61,12 +76,12 @@ module.exports = async function handler(
 
             headers: {
               "Content-Type":
-                "application/json"
+                "text/plain;charset=utf-8"
             },
 
             body:
               JSON.stringify(
-                req.body || {}
+                payload || {}
               ),
 
             redirect:
@@ -79,25 +94,32 @@ module.exports = async function handler(
         await response.text();
 
 
-      res
-        .status(
-          response.ok
-            ? 200
-            : response.status
-        )
-        .setHeader(
-          "Content-Type",
-          "application/json"
-        )
-        .setHeader(
-          "Cache-Control",
-          "no-store"
-        )
+      // Helpful server-side debugging
+      console.log(
+        "Apps Script status:",
+        response.status
+      );
+
+      console.log(
+        "Apps Script response:",
+        text
+      );
+
+
+      res.setHeader(
+        "Content-Type",
+        "application/json; charset=utf-8"
+      );
+
+      res.setHeader(
+        "Cache-Control",
+        "no-store"
+      );
+
+
+      return res
+        .status(response.status)
         .send(text);
-
-
-      return;
-
     }
 
 
@@ -105,7 +127,7 @@ module.exports = async function handler(
     // METHOD NOT ALLOWED
     // =========================
 
-    res
+    return res
       .status(405)
       .json({
         success: false,
@@ -117,17 +139,23 @@ module.exports = async function handler(
   } catch (error) {
 
     console.error(
-      "CRM proxy error:",
+      "CRM PROXY ERROR:",
       error
     );
 
 
-    res
+    return res
       .status(500)
       .json({
         success: false,
+
         message:
-          "Unable to reach CRM backend."
+          "CRM proxy failed.",
+
+        error:
+          error instanceof Error
+            ? error.message
+            : String(error)
       });
 
   }
