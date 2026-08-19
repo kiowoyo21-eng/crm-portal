@@ -6,6 +6,9 @@
  * paste its /exec URL here.
  */
 const CRM_CONFIG = {
-  API_URL: "",
-  APP_NAME: "CRM Portal"
+  API_URL:
+    "https://script.google.com/macros/s/AKfycbwDmJGpj37YWOvP5gGbw-ARe1WuZG3H1cOYWVByhPnVjFv4dXxRXu8UFR2yQ1xVUIBJ/exec",
+
+  APP_NAME:
+    "CRM Portal"
 };
