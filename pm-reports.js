@@ -1,9 +1,6 @@
-function loadPMReports() {
+async function loadPMReports() {
 
-  if (
-    !currentUser ||
-    !currentUser.userId
-  ) {
+  if (!currentUser) {
     return;
   }
 
@@ -119,69 +116,75 @@ function loadPMReports() {
 
 
   // =========================
-  // LOAD REPORT
+  // LOAD REPORT THROUGH API
   // =========================
 
-  google.script.run
+  try {
 
-    .withSuccessHandler(
-      function(result) {
+    const result =
+      await crmApi(
+        "getPMReportsData",
+        {
+          startDate:
+            startDate,
 
-        console.log(
-          "PM Reports:",
-          result
-        );
+          endDate:
+            endDate,
 
-
-        if (
-          !result ||
-          !result.success
-        ) {
-
-          alert(
-            result &&
-            result.message
-              ? result.message
-              : "Unable to load reports."
-          );
-
-          return;
+          branch:
+            branch
         }
+      );
 
 
-        renderPMReports(
-          result
-        );
+    console.log(
+      "PM Reports:",
+      result
+    );
 
-      }
-    )
 
-    .withFailureHandler(
-  function(error) {
+    if (
+      !result ||
+      !result.success
+    ) {
+
+      alert(
+        result &&
+        result.message
+          ? result.message
+          : "Unable to load reports."
+      );
+
+      return;
+    }
+
+
+    renderPMReports(
+      result
+    );
+
+
+  } catch (error) {
 
     console.error(
       "PM Reports error:",
       error
     );
 
+
     alert(
       "REPORT ERROR:\n\n" +
       (
-        error && error.message
+        error &&
+        error.message
           ? error.message
-          : JSON.stringify(error)
+          : JSON.stringify(
+              error
+            )
       )
     );
 
   }
-)
-
-    .getPMReportsData(
-      currentUser.userId,
-      startDate,
-      endDate,
-      branch
-    );
 
 }
 
