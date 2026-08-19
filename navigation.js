@@ -1,8 +1,12 @@
 function buildSidebar(role) {
 
-  const menu = document.getElementById("sidebarMenu");
+  const menu =
+    document.getElementById(
+      "sidebarMenu"
+    );
 
   menu.innerHTML = "";
+
 
   const menus = {
 
@@ -28,12 +32,12 @@ function buildSidebar(role) {
       "Dashboard",
       "Appointments",
       "Opportunities",
-      "Supplier",
+      "Suppliers",
       "Products",
       "Employees / Attendance",
       "Approvals / Requests",
       "Reports",
-      "Request"
+      "Requests"
     ],
 
     HR: [
@@ -76,136 +80,347 @@ function buildSidebar(role) {
 
   };
 
-  const selectedMenu = menus[role] || [
-    "Dashboard"
-  ];
 
-  selectedMenu.forEach(function(moduleName, index) {
+  const selectedMenu =
+    menus[role] || [
+      "Dashboard"
+    ];
 
-    const button = document.createElement("button");
 
-    button.className = "nav-item";
+  selectedMenu.forEach(
+    function(
+      moduleName,
+      index
+    ) {
 
-    if (index === 0) {
-      button.classList.add("active");
+      const button =
+        document.createElement(
+          "button"
+        );
+
+      button.className =
+        "nav-item";
+
+
+      if (index === 0) {
+
+        button.classList.add(
+          "active"
+        );
+
+      }
+
+
+      button.textContent =
+        moduleName;
+
+
+      button.onclick =
+        function() {
+
+          selectModule(
+            moduleName,
+            button
+          );
+
+        };
+
+
+      menu.appendChild(
+        button
+      );
+
     }
-
-    button.textContent = moduleName;
-
-    button.onclick = function() {
-      selectModule(moduleName, button);
-    };
-
-    menu.appendChild(button);
-
-  });
+  );
 
 }
 
 
-    /* =========================
-       MODULE SELECTION
-       ========================= */
-function selectModule(moduleName, button) {
+// ========================================
+// MODULE SELECTION
+// ========================================
+
+function selectModule(
+  moduleName,
+  button
+) {
+
+  const pageTitle =
+    document.getElementById(
+      "pageTitle"
+    );
+
+
+  if (pageTitle) {
+
+    pageTitle.textContent =
+      moduleName;
+
+  }
+
+
+  // =========================
+  // SIDEBAR ACTIVE STATE
+  // =========================
 
   document
-    .getElementById("pageTitle")
-    .textContent = moduleName;
+    .querySelectorAll(
+      ".nav-item"
+    )
+    .forEach(
+      function(item) {
 
-  document
-    .querySelectorAll(".nav-item")
-    .forEach(function(item) {
-      item.classList.remove("active");
-    });
+        item.classList.remove(
+          "active"
+        );
+
+      }
+    );
+
 
   if (button) {
-    button.classList.add("active");
+
+    button.classList.add(
+      "active"
+    );
+
   }
+
+
+  // =========================
+  // AVAILABLE VIEWS
+  // =========================
 
   const dashboardView =
-    document.getElementById("dashboardView");
+    document.getElementById(
+      "dashboardView"
+    );
 
   const leadsView =
-    document.getElementById("leadsView");
+    document.getElementById(
+      "leadsView"
+    );
 
-    const appointmentsView =
-  document.getElementById("appointmentsView");
+  const appointmentsView =
+    document.getElementById(
+      "appointmentsView"
+    );
 
   const requestsView =
-  document.getElementById("requestsView");
+    document.getElementById(
+      "requestsView"
+    );
 
   const reportsView =
-  document.getElementById("reportsView");
+    document.getElementById(
+      "reportsView"
+    );
 
-  // Hide all module views first
-  dashboardView.style.display = "none";
-  leadsView.style.display = "none";
-  appointmentsView.style.display = "none";
-  requestsView.style.display = "none";
-  reportsView.style.display = "none";
 
-  if (moduleName === "Dashboard") {
+  // =========================
+  // HIDE ALL VIEWS
+  // =========================
 
-    dashboardView.style.display = "block";
+  [
+    dashboardView,
+    leadsView,
+    appointmentsView,
+    requestsView,
+    reportsView
+  ]
+    .forEach(
+      function(view) {
 
-    if (currentUser) {
-      loadDashboardData(
-        currentUser.userId
-      );
+        if (view) {
+
+          view.style.display =
+            "none";
+
+        }
+
+      }
+    );
+
+
+  // =========================
+  // DASHBOARD
+  // =========================
+
+  if (
+    moduleName ===
+    "Dashboard"
+  ) {
+
+    if (dashboardView) {
+
+      dashboardView.style.display =
+        "block";
+
     }
 
+
+    if (
+      currentUser &&
+      typeof loadDashboardData ===
+        "function"
+    ) {
+
+      loadDashboardData();
+
+    }
+
+
     return;
+
   }
 
-  if (moduleName === "Leads") {
 
-    leadsView.style.display = "block";
+  // =========================
+  // PM LEADS
+  // =========================
 
-    loadLeads();
+  if (
+    moduleName ===
+    "Leads"
+  ) {
+
+    if (leadsView) {
+
+      leadsView.style.display =
+        "block";
+
+    }
+
+
+    if (
+      typeof loadLeads ===
+        "function"
+    ) {
+
+      loadLeads();
+
+    }
+
 
     return;
+
   }
 
-  if (moduleName === "Appointments") {
 
-  appointmentsView.style.display = "block";
+  // =========================
+  // SHARED APPOINTMENTS
+  // =========================
 
-  loadAppointmentsCalendar();
+  if (
+    moduleName ===
+    "Appointments"
+  ) {
 
-  return;
+    if (appointmentsView) {
+
+      appointmentsView.style.display =
+        "block";
+
+    }
+
+
+    if (
+      typeof loadAppointmentsCalendar ===
+        "function"
+    ) {
+
+      loadAppointmentsCalendar();
+
+    }
+
+
+    return;
+
+  }
+
+
+  // =========================
+  // SHARED REQUESTS
+  // =========================
+
+  if (
+    moduleName ===
+    "Requests"
+  ) {
+
+    if (requestsView) {
+
+      requestsView.style.display =
+        "block";
+
+    }
+
+
+    if (
+      typeof loadRequests ===
+        "function"
+    ) {
+
+      loadRequests();
+
+    }
+
+
+    return;
+
+  }
+
+
+  // =========================
+  // PM REPORTS
+  // =========================
+
+  if (
+    moduleName ===
+    "Reports"
+  ) {
+
+    if (reportsView) {
+
+      reportsView.style.display =
+        "block";
+
+    }
+
+
+    if (
+      typeof loadPMReports ===
+        "function"
+    ) {
+
+      loadPMReports();
+
+    }
+
+
+    return;
+
+  }
+
+
+  // =========================
+  // MODULE NOT BUILT YET
+  // =========================
+
+  console.log(
+    "Module view not built yet:",
+    moduleName
+  );
+
 }
 
-if (moduleName === "Requests") {
 
-  requestsView.style.display = "block";
+// ========================================
+// SHARED APPOINTMENTS STATE
+// ========================================
 
-  loadRequests();
-
-  return;
-}
-
-if (moduleName === "Reports") {
-
-  reportsView.style.display = "block";
-
-  loadPMReports();
-
-  return;
-}
-
-}
-
-
-// =========================
-// APPOINTMENTS CALENDAR
-// =========================
-
-let currentAppointments = [];
+let currentAppointments =
+  [];
 
 let appointmentCalendarDate =
   new Date();
-
-
-// =========================
-// LOAD APPOINTMENTS
-// =========================
