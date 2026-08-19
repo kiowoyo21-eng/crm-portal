@@ -1,15 +1,18 @@
-function loadAppointmentsCalendar() {
+async function loadAppointmentsCalendar() {
 
   if (!currentUser) {
     return;
   }
+
 
   const grid =
     document.getElementById(
       "appointmentCalendarGrid"
     );
 
+
   if (grid) {
+
     grid.innerHTML = `
       <div
         class="calendar-empty"
@@ -18,63 +21,109 @@ function loadAppointmentsCalendar() {
         Loading appointments...
       </div>
     `;
+
   }
 
 
-  google.script.run
+  try {
 
-    .withSuccessHandler(function(result) {
+    // =========================
+    // LOAD THROUGH CRM API
+    // =========================
 
-      if (!result || !result.success) {
-
-        if (grid) {
-          grid.innerHTML = `
-            <div
-              class="calendar-empty"
-              style="grid-column: 1 / -1;"
-            >
-              Unable to load appointments.
-            </div>
-          `;
-        }
-
-        return;
-      }
-
-
-      currentAppointments =
-        result.appointments || [];
-
-
-      renderAppointmentsCalendar();
-
-    })
-
-
-    .withFailureHandler(function(error) {
-
-      console.error(
-        "Unable to load appointments:",
-        error
+    const result =
+      await crmApi(
+        "getAppointmentsData"
       );
 
+
+    if (
+      !result ||
+      !result.success
+    ) {
+
+      console.error(
+        "Appointments data failed:",
+        result
+      );
+
+
       if (grid) {
+
         grid.innerHTML = `
           <div
             class="calendar-empty"
             style="grid-column: 1 / -1;"
           >
-            Unable to connect to the CRM.
+            Unable to load appointments.
           </div>
         `;
+
       }
 
-    })
+
+      // Invalid / expired API session
+      if (
+        result &&
+        (
+          result.message ===
+            "Invalid session." ||
+
+          result.message ===
+            "Session expired." ||
+
+          result.message ===
+            "Session token is required."
+        )
+      ) {
+
+        clearLocalCrmLogin();
+
+      }
 
 
-    .getAppointmentsData(
-      currentUser.userId
+      return;
+
+    }
+
+
+    // =========================
+    // SAVE APPOINTMENTS
+    // =========================
+
+    currentAppointments =
+      result.appointments || [];
+
+
+    // =========================
+    // RENDER CALENDAR
+    // =========================
+
+    renderAppointmentsCalendar();
+
+
+  } catch (error) {
+
+    console.error(
+      "Unable to load appointments:",
+      error
     );
+
+
+    if (grid) {
+
+      grid.innerHTML = `
+        <div
+          class="calendar-empty"
+          style="grid-column: 1 / -1;"
+        >
+          Unable to connect to the CRM.
+        </div>
+      `;
+
+    }
+
+  }
 
 }
 
