@@ -1,4 +1,4 @@
-fasync function loadLeads() {
+async function loadLeads() {
 
   if (!currentUser) {
     return;
