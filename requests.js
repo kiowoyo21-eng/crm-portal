@@ -1,3 +1,10 @@
+let currentRequests =
+  [];
+
+let selectedRequestId =
+  null;
+
+
 async function loadRequests() {
 
   const tableBody =
@@ -268,7 +275,9 @@ function renderRequestsTable() {
 
 }
 
-function openRequestDetails(requestId) {
+function openRequestDetails(
+  requestId
+) {
 
   const request =
     currentRequests.find(
@@ -291,8 +300,21 @@ function openRequestDetails(requestId) {
     );
 
     return;
+
   }
 
+
+  // ========================================
+  // SELECTED REQUEST
+  // ========================================
+
+  selectedRequestId =
+    request.requestId;
+
+
+  // ========================================
+  // BASIC DETAILS
+  // ========================================
 
   document
     .getElementById(
@@ -336,6 +358,14 @@ function openRequestDetails(requestId) {
 
   document
     .getElementById(
+      "requestDetailsActionRequired"
+    )
+    .textContent =
+    request.actionRequired || "PROCESS";
+
+
+  document
+    .getElementById(
       "requestDetailsBranch"
     )
     .textContent =
@@ -350,12 +380,28 @@ function openRequestDetails(requestId) {
     request.createdAt || "—";
 
 
-document
-  .getElementById(
-    "requestDetailsCreatedBy"
-  )
-  .textContent =
-  request.requestedBy || "—";
+  document
+    .getElementById(
+      "requestDetailsCreatedBy"
+    )
+    .textContent =
+    request.requestedBy || "—";
+
+
+  document
+    .getElementById(
+      "requestDetailsTargetRole"
+    )
+    .textContent =
+    request.targetRole || "—";
+
+
+  document
+    .getElementById(
+      "requestDetailsAssignedTo"
+    )
+    .textContent =
+    request.assignedTo || "Unassigned";
 
 
   document
@@ -366,50 +412,463 @@ document
     request.description || "—";
 
 
+  // ========================================
+  // FINAL PROCESSING INFORMATION
+  // ========================================
+
   const resolutionSection =
     document.getElementById(
       "requestResolutionSection"
     );
 
 
-  if (
+  const hasProcessingInfo =
     request.resolvedBy ||
-    request.resolvedAt
+    request.resolvedAt ||
+    request.processedBy ||
+    request.processedAt ||
+    request.resolutionRemarks ||
+    request.decisionRemarks;
+
+
+  if (
+    resolutionSection
   ) {
 
     resolutionSection.style.display =
-      "block";
-
-    document
-      .getElementById(
-        "requestDetailsResolvedBy"
-      )
-      .textContent =
-      request.resolvedBy || "—";
-
-    document
-      .getElementById(
-        "requestDetailsResolvedAt"
-      )
-      .textContent =
-      request.resolvedAt || "—";
-
-  } else {
-
-    resolutionSection.style.display =
-      "none";
+      hasProcessingInfo
+        ? "block"
+        : "none";
 
   }
 
 
   document
     .getElementById(
+      "requestDetailsResolvedBy"
+    )
+    .textContent =
+    request.resolvedBy || "—";
+
+
+  document
+    .getElementById(
+      "requestDetailsResolvedAt"
+    )
+    .textContent =
+    request.resolvedAt || "—";
+
+
+  document
+    .getElementById(
+      "requestDetailsProcessedBy"
+    )
+    .textContent =
+    request.processedBy || "—";
+
+
+  document
+    .getElementById(
+      "requestDetailsProcessedAt"
+    )
+    .textContent =
+    request.processedAt || "—";
+
+
+  // ========================================
+  // RESOLUTION REMARKS
+  // ========================================
+
+  const resolutionRemarksGroup =
+    document.getElementById(
+      "requestDetailsResolutionRemarksGroup"
+    );
+
+
+  const resolutionRemarks =
+    document.getElementById(
+      "requestDetailsResolutionRemarks"
+    );
+
+
+  if (
+    request.resolutionRemarks
+  ) {
+
+    resolutionRemarksGroup.style.display =
+      "block";
+
+    resolutionRemarks.textContent =
+      request.resolutionRemarks;
+
+  } else {
+
+    resolutionRemarksGroup.style.display =
+      "none";
+
+    resolutionRemarks.textContent =
+      "—";
+
+  }
+
+
+  // ========================================
+  // DECISION REMARKS
+  // ========================================
+
+  const decisionRemarksGroup =
+    document.getElementById(
+      "requestDetailsDecisionRemarksGroup"
+    );
+
+
+  const decisionRemarks =
+    document.getElementById(
+      "requestDetailsDecisionRemarks"
+    );
+
+
+  if (
+    request.decisionRemarks
+  ) {
+
+    decisionRemarksGroup.style.display =
+      "block";
+
+    decisionRemarks.textContent =
+      request.decisionRemarks;
+
+  } else {
+
+    decisionRemarksGroup.style.display =
+      "none";
+
+    decisionRemarks.textContent =
+      "—";
+
+  }
+
+
+  // ========================================
+  // CURRENT USER / ROLE
+  // ========================================
+
+  const currentRole =
+    String(
+      currentUser &&
+      (
+        currentUser.systemRole ||
+        currentUser.role
+      ) ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+
+
+  const currentBranch =
+    String(
+      currentUser &&
+      (
+        currentUser.branchId ||
+        currentUser.branch
+      ) ||
+      ""
+    ).trim();
+
+
+  const targetRole =
+    String(
+      request.targetRole || ""
+    )
+      .trim()
+      .toUpperCase();
+
+
+  const targetBranch =
+    String(
+      request.targetBranchId ||
+      request.branchId ||
+      ""
+    ).trim();
+
+
+  // ========================================
+  // CAN CURRENT USER PROCESS?
+  // ========================================
+
+  let canProcess =
+    false;
+
+
+  // Direk = global processor
+  if (
+    currentRole === "DIREK"
+  ) {
+
+    canProcess =
+      true;
+
+  }
+
+
+  // IT-targeted requests
+  if (
+    currentRole === "IT" &&
+    targetRole === "IT"
+  ) {
+
+    canProcess =
+      true;
+
+  }
+
+
+  // HR-targeted requests
+  if (
+    currentRole === "HR" &&
+    targetRole === "HR"
+  ) {
+
+    canProcess =
+      true;
+
+  }
+
+
+  // BM-targeted requests
+  // must belong to same branch
+  if (
+    currentRole === "BM" &&
+    targetRole === "BM" &&
+    targetBranch === currentBranch
+  ) {
+
+    canProcess =
+      true;
+
+  }
+
+
+  // ========================================
+  // PROCESSING CONTROLS
+  // ========================================
+
+  const processingSection =
+    document.getElementById(
+      "requestProcessingSection"
+    );
+
+
+  const processButton =
+    document.getElementById(
+      "requestProcessButton"
+    );
+
+
+  const statusSelect =
+    document.getElementById(
+      "requestProcessStatus"
+    );
+
+
+  const assignedInput =
+    document.getElementById(
+      "requestProcessAssignedTo"
+    );
+
+
+  const resolutionInput =
+    document.getElementById(
+      "requestProcessResolutionRemarks"
+    );
+
+
+  const decisionInput =
+    document.getElementById(
+      "requestProcessDecisionRemarks"
+    );
+
+
+  const resolutionInputGroup =
+    document.getElementById(
+      "requestResolutionRemarksGroup"
+    );
+
+
+  const decisionInputGroup =
+    document.getElementById(
+      "requestDecisionRemarksGroup"
+    );
+
+
+  const processMessage =
+    document.getElementById(
+      "requestProcessMessage"
+    );
+
+
+  // Reset message
+  if (
+    processMessage
+  ) {
+
+    processMessage.textContent =
+      "";
+
+    processMessage.className =
+      "modal-message";
+
+  }
+
+
+  if (
+    canProcess
+  ) {
+
+    processingSection.style.display =
+      "block";
+
+    processButton.style.display =
+      "inline-flex";
+
+
+    // ======================================
+    // BUILD STATUS OPTIONS
+    // ======================================
+
+    const actionRequired =
+      String(
+        request.actionRequired ||
+        "PROCESS"
+      )
+        .trim()
+        .toUpperCase();
+
+
+    let statuses =
+      [];
+
+
+    if (
+      actionRequired ===
+      "APPROVAL"
+    ) {
+
+      statuses = [
+        "Pending",
+        "Approved",
+        "Rejected"
+      ];
+
+
+      resolutionInputGroup.style.display =
+        "none";
+
+      decisionInputGroup.style.display =
+        "block";
+
+
+    } else {
+
+      statuses = [
+        "Pending",
+        "In Progress",
+        "Resolved"
+      ];
+
+
+      resolutionInputGroup.style.display =
+        "block";
+
+      decisionInputGroup.style.display =
+        "none";
+
+    }
+
+
+    statusSelect.innerHTML =
+      "";
+
+
+    statuses.forEach(
+      function(status) {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+
+        option.value =
+          status;
+
+        option.textContent =
+          status;
+
+
+        statusSelect.appendChild(
+          option
+        );
+
+      }
+    );
+
+
+    // Current status
+    if (
+      statuses.includes(
+        request.status
+      )
+    ) {
+
+      statusSelect.value =
+        request.status;
+
+    }
+
+
+    // Existing assignment
+    assignedInput.value =
+      request.assignedTo || "";
+
+
+    // Existing remarks
+    resolutionInput.value =
+      request.resolutionRemarks || "";
+
+
+    decisionInput.value =
+      request.decisionRemarks || "";
+
+
+  } else {
+
+    // Requester / unauthorized user:
+    // details only.
+
+    processingSection.style.display =
+      "none";
+
+    processButton.style.display =
+      "none";
+
+  }
+
+
+  // ========================================
+  // OPEN MODAL
+  // ========================================
+
+  document
+    .getElementById(
       "requestDetailsModal"
     )
-    .classList.add("show");
+    .classList.add(
+      "show"
+    );
 
 }
-
 
 function closeRequestDetails() {
 
