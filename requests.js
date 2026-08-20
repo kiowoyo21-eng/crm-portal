@@ -1,5 +1,4 @@
-let currentRequests =
-  [];
+
 
 let selectedRequestId =
   null;
