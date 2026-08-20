@@ -1592,35 +1592,44 @@
         </div>
 
 
-        <div class="form-group">
+      <div class="form-group">
 
-          <label>
-            Module
-          </label>
+  <label>
+    Module *
+  </label>
 
-          <input
-            type="text"
-            id="newSupportModule"
-            placeholder="Example: Leads"
-          />
+  <select
+    id="newSupportModule"
+    class="form-select"
+    onchange="updateSupportViewOptions()"
+    required
+  >
+    <option value="">
+      Select module
+    </option>
+  </select>
 
-        </div>
+</div>
 
 
-        <div class="form-group">
+<div class="form-group">
 
-          <label>
-            View
-          </label>
+  <label>
+    View *
+  </label>
 
-          <input
-            type="text"
-            id="newSupportViewName"
-            placeholder="Example: Edit Lead"
-          />
+  <select
+    id="newSupportViewName"
+    class="form-select"
+    required
+    disabled
+  >
+    <option value="">
+      Select module first
+    </option>
+  </select>
 
-        </div>
-
+</div>
       </div>
 
 
