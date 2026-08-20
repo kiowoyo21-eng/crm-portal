@@ -110,71 +110,144 @@
     </div>
 </div>
 <!-- PM DASHBOARD KPI CARDS -->
+
 <div class="kpi-grid pm-kpi-grid">
-<div class="kpi-card">
-<div class="kpi-top">
-<span class="kpi-label">
+
+  <!-- TOTAL INQUIRIES TODAY -->
+  <div
+    class="kpi-card kpi-card-clickable"
+    onclick="openPMTodayInquiriesQueue()"
+    role="button"
+    tabindex="0"
+  >
+
+    <div class="kpi-top">
+
+      <span class="kpi-label">
         TOTAL INQUIRIES TODAY
       </span>
-<span class="kpi-icon">
+
+      <span class="kpi-icon">
         I
       </span>
-</div>
-<div class="kpi-value" id="kpiInquiries">
+
+    </div>
+
+    <div
+      class="kpi-value"
+      id="kpiInquiries"
+    >
       0
     </div>
-<div class="kpi-subtext">
+
+    <div class="kpi-subtext">
       New inquiries created today
     </div>
-</div>
-<div class="kpi-card">
-<div class="kpi-top">
-<span class="kpi-label">
+
+  </div>
+
+
+  <!-- TOTAL APPOINTMENTS CREATED -->
+  <div
+    class="kpi-card kpi-card-clickable"
+    onclick="openPMTodayBookingsQueue()"
+    role="button"
+    tabindex="0"
+  >
+
+    <div class="kpi-top">
+
+      <span class="kpi-label">
         TOTAL APPOINTMENTS CREATED
       </span>
-<span class="kpi-icon">
+
+      <span class="kpi-icon">
         A
       </span>
-</div>
-<div class="kpi-value" id="kpiAppointmentsCreated">
+
+    </div>
+
+    <div
+      class="kpi-value"
+      id="kpiAppointmentsCreated"
+    >
       0
     </div>
-<div class="kpi-subtext">
+
+    <div class="kpi-subtext">
       Appointments booked today
     </div>
-</div>
-<div class="kpi-card kpi-card-clickable" onclick="openPMFollowUpQueue()" role="button" tabindex="0">
-<div class="kpi-top">
-<span class="kpi-label">
+
+  </div>
+
+
+  <!-- TO FOLLOW UP -->
+  <div
+    class="kpi-card kpi-card-clickable"
+    onclick="openPMFollowUpQueue()"
+    role="button"
+    tabindex="0"
+  >
+
+    <div class="kpi-top">
+
+      <span class="kpi-label">
         TO FOLLOW UP
       </span>
-<span class="kpi-icon">
+
+      <span class="kpi-icon">
         F
       </span>
-</div>
-<div class="kpi-value" id="kpiToFollowUp">
+
+    </div>
+
+    <div
+      class="kpi-value"
+      id="kpiToFollowUp"
+    >
       0
     </div>
-<div class="kpi-subtext">
+
+    <div class="kpi-subtext">
       Leads that need follow-up
     </div>
-</div>
-<div class="kpi-card kpi-card-clickable" onclick="openPMReminderQueue()" role="button" tabindex="0">
-<div class="kpi-top">
-<span class="kpi-label">
+
+  </div>
+
+
+  <!-- TO REMIND -->
+  <div
+    class="kpi-card kpi-card-clickable"
+    onclick="openPMReminderQueue()"
+    role="button"
+    tabindex="0"
+  >
+
+    <div class="kpi-top">
+
+      <span class="kpi-label">
         TO REMIND
       </span>
-<span class="kpi-icon">
+
+      <span class="kpi-icon">
         R
       </span>
-</div>
-<div class="kpi-value" id="kpiToRemind">
+
+    </div>
+
+    <div
+      class="kpi-value"
+      id="kpiToRemind"
+    >
       0
     </div>
-<div class="kpi-subtext">
+
+    <div class="kpi-subtext">
       Tomorrow's appointments
     </div>
-</div>
+
+  </div>
+
 </div>
 <!-- TODAY'S APPOINTMENTS -->
 <div class="dashboard-panel">
