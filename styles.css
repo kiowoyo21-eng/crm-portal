@@ -3710,3 +3710,144 @@ tbody tr:hover {
   border-color:
     var(--crm-gold-border);
 }
+
+/* =========================================================
+   PM DASHBOARD QUEUE — FOOTER / EMPTY / MOBILE
+========================================================= */
+
+.crm-queue-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 16px 20px;
+
+  color: var(--crm-text-muted);
+
+  background: #14191f;
+
+  border-top:
+    1px solid var(--crm-divider);
+
+  font-size: 13px;
+}
+
+
+.crm-queue-empty {
+  min-height: 230px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 32px;
+
+  color: var(--crm-text-muted);
+
+  text-align: center;
+}
+
+
+.crm-queue-empty strong {
+  color: var(--crm-text);
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+
+.crm-queue-empty span {
+  max-width: 420px;
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+
+.crm-queue-empty-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 6px;
+
+  color: var(--crm-gold);
+
+  background: var(--crm-gold-soft);
+
+  border:
+    1px solid var(--crm-gold-border);
+
+  border-radius: 50%;
+
+  font-size: 18px;
+}
+
+
+/* Better clickable KPI feedback */
+
+.kpi-card-clickable {
+  cursor: pointer;
+}
+
+.kpi-card-clickable:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 640px) {
+
+  .crm-queue-overlay {
+    padding: 12px;
+  }
+
+  .crm-queue-modal {
+    max-height: 92vh;
+  }
+
+  .crm-queue-header {
+    padding: 18px;
+  }
+
+  .crm-queue-list {
+    padding: 10px;
+  }
+
+  .crm-queue-item {
+    align-items: flex-start;
+    flex-direction: column;
+
+    padding: 15px;
+  }
+
+  .crm-queue-actions {
+    width: 100%;
+  }
+
+  .crm-queue-actions button {
+    width: 100%;
+  }
+
+  .crm-queue-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .crm-queue-footer button {
+    width: 100%;
+  }
+
+}
