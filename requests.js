@@ -1077,6 +1077,186 @@ async function submitNewRequest(
 
 }
 
+async function submitRequestUpdate() {
+
+  if (
+    !selectedRequestId ||
+    !currentUser
+  ) {
+    return;
+  }
+
+
+  const button =
+    document.getElementById(
+      "requestProcessButton"
+    );
+
+  const message =
+    document.getElementById(
+      "requestProcessMessage"
+    );
+
+
+  const status =
+    document
+      .getElementById(
+        "requestProcessStatus"
+      )
+      .value;
+
+
+  const assignedTo =
+    document
+      .getElementById(
+        "requestProcessAssignedTo"
+      )
+      .value
+      .trim();
+
+
+  const resolutionRemarks =
+    document
+      .getElementById(
+        "requestProcessResolutionRemarks"
+      )
+      .value
+      .trim();
+
+
+  const decisionRemarks =
+    document
+      .getElementById(
+        "requestProcessDecisionRemarks"
+      )
+      .value
+      .trim();
+
+
+  if (!status) {
+
+    message.className =
+      "modal-message error";
+
+    message.textContent =
+      "Please select a status.";
+
+    return;
+
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "UPDATING...";
+
+
+  message.className =
+    "modal-message";
+
+  message.textContent =
+    "";
+
+
+  try {
+
+    const result =
+      await crmApi(
+        "updateRequest",
+        {
+
+          requestId:
+            selectedRequestId,
+
+          updates: {
+
+            status:
+              status,
+
+            assignedTo:
+              assignedTo,
+
+            resolutionRemarks:
+              resolutionRemarks,
+
+            decisionRemarks:
+              decisionRemarks
+
+          }
+
+        }
+      );
+
+
+    if (
+      !result ||
+      !result.success
+    ) {
+
+      message.className =
+        "modal-message error";
+
+      message.textContent =
+        result &&
+        result.message
+          ? result.message
+          : "Unable to update request.";
+
+      return;
+
+    }
+
+
+    message.className =
+      "modal-message success";
+
+    message.textContent =
+      "Request updated successfully.";
+
+
+    setTimeout(
+      async function() {
+
+        closeRequestDetails();
+
+        await loadRequests();
+
+      },
+      500
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Request update error:",
+      error
+    );
+
+
+    message.className =
+      "modal-message error";
+
+    message.textContent =
+      error &&
+      error.message
+        ? error.message
+        : "Unable to update request.";
+
+
+  } finally {
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "UPDATE REQUEST";
+
+  }
+
+}
+
 
     /* =========================
        LOGOUT
