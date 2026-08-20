@@ -5,7 +5,8 @@
 <base target="_top"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 
-<link href="styles.css" rel="stylesheet"/></head>
+<link href="styles.css" rel="stylesheet"/>
+<link href="sa.css" rel="stylesheet"/></head>
 <body>
 <!-- =========================
        LOGIN PAGE
@@ -2066,7 +2067,147 @@
 </div>
 
 
-       
+
+
+<!-- =========================================================
+     SA PRODUCTION V1 — DASHBOARD
+========================================================= -->
+<div id="saDashboardView" style="display:none;">
+
+  <div class="dashboard-header">
+    <div>
+      <div class="dashboard-eyebrow">SERVICE ADVISOR</div>
+      <div class="welcome-title">Production Dashboard</div>
+      <div class="welcome-text">
+        Your assigned Opportunities are prioritized while branch activity remains visible.
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">MY ACTIVE OPPORTUNITIES</div>
+      <div class="kpi-value" id="saKpiMyActive">0</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">BRANCH ACTIVE</div>
+      <div class="kpi-value" id="saKpiBranchActive">0</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">FOR RELEASE</div>
+      <div class="kpi-value" id="saKpiForRelease">0</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">RELEASED TODAY</div>
+      <div class="kpi-value" id="saKpiReleasedToday">0</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">PENDING COMPLIANCE</div>
+      <div class="kpi-value" id="saKpiPendingCompliance">0</div>
+    </div>
+  </div>
+
+  <div class="dashboard-panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title">Branch Opportunities</div>
+        <div class="panel-subtitle">Your assigned clients are shown first.</div>
+      </div>
+
+      <button
+        class="panel-action"
+        type="button"
+        onclick="selectDashboardModule('Opportunities')"
+      >
+        VIEW ALL
+      </button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Opportunity</th>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Assigned SA</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody id="saDashboardOpportunityBody">
+          <tr>
+            <td colspan="6" class="table-empty">
+              No Opportunities loaded.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     SA PRODUCTION V1 — OPPORTUNITIES
+========================================================= -->
+<div id="saOpportunitiesView" style="display:none;">
+
+  <div class="module-header">
+    <div>
+      <div class="dashboard-eyebrow">SERVICE ADVISOR</div>
+      <div class="module-title">Opportunities</div>
+      <div class="module-subtitle">
+        View all branch Opportunities. Your assigned clients appear first.
+      </div>
+    </div>
+  </div>
+
+  <div class="module-toolbar">
+    <input
+      id="saOpportunitySearch"
+      class="module-search"
+      type="text"
+      placeholder="Search opportunity, customer, contact, vehicle, plate, SA or status..."
+      oninput="renderSAOpportunitiesTable()"
+    />
+  </div>
+
+  <div class="dashboard-panel">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Assigned SA</th>
+            <th>Status</th>
+            <th>Current QT</th>
+            <th>Current JO</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody id="saOpportunitiesTableBody">
+          <tr>
+            <td colspan="8" class="table-empty">
+              Select Opportunities to load records.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
 </section>
 </main>
 </div>
@@ -2870,7 +3011,642 @@
 </div>
 </div>
 
-       
+
+
+<!-- =========================================================
+     SA OPPORTUNITY DETAILS MODAL
+========================================================= -->
+<div class="crm-modal" id="saOpportunityModal">
+
+  <div
+    class="crm-modal-backdrop"
+    onclick="closeSAOpportunity()"
+  ></div>
+
+  <div class="crm-modal-card">
+
+    <div class="crm-modal-header">
+      <div>
+        <div class="dashboard-eyebrow">OPPORTUNITY</div>
+
+        <div
+          class="crm-modal-title"
+          id="saOppDetailsCustomer"
+        >
+          —
+        </div>
+
+        <div
+          class="crm-modal-subtitle"
+          id="saOppDetailsId"
+        >
+          —
+        </div>
+      </div>
+
+      <button
+        class="modal-close"
+        type="button"
+        onclick="closeSAOpportunity()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="support-details-body">
+
+      <div class="support-detail-grid">
+
+        <div class="support-detail-item">
+          <span>Vehicle</span>
+          <strong id="saOppDetailsVehicle">—</strong>
+        </div>
+
+        <div class="support-detail-item">
+          <span>Assigned SA</span>
+          <strong id="saOppDetailsAssigned">—</strong>
+        </div>
+
+        <div class="support-detail-item">
+          <span>Status</span>
+          <strong id="saOppDetailsStatus">—</strong>
+        </div>
+
+        <div class="support-detail-item">
+          <span>Current QT</span>
+          <strong id="saOppDetailsCurrentQt">—</strong>
+        </div>
+
+        <div class="support-detail-item">
+          <span>Current JO</span>
+          <strong id="saOppDetailsCurrentJo">—</strong>
+        </div>
+
+      </div>
+
+      <div class="crm-modal-footer">
+
+        <button
+          class="secondary-action"
+          type="button"
+          onclick="closeSAOpportunity()"
+        >
+          CLOSE
+        </button>
+
+        <button
+          class="primary-action"
+          type="button"
+          onclick="startInitialQuotation()"
+        >
+          CREATE QUOTATION
+        </button>
+
+        <button
+          class="secondary-action"
+          type="button"
+          onclick="openSARelease(selectedSAOpportunityId)"
+        >
+          RELEASE WORKSPACE
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     SA QUOTATION BUILDER MODAL
+========================================================= -->
+<div class="crm-modal" id="saQuotationModal">
+
+  <div
+    class="crm-modal-backdrop"
+    onclick="document.getElementById('saQuotationModal').classList.remove('show')"
+  ></div>
+
+  <div
+    class="crm-modal-card"
+    style="width:min(1120px, 96vw);"
+  >
+
+    <div class="crm-modal-header">
+
+      <div>
+        <div class="dashboard-eyebrow">QUOTATION</div>
+        <div class="crm-modal-title">Quotation Builder</div>
+        <div class="crm-modal-subtitle">
+          Default prices are references only. Quoted prices are editable per QT.
+        </div>
+      </div>
+
+      <button
+        class="modal-close"
+        type="button"
+        onclick="document.getElementById('saQuotationModal').classList.remove('show')"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div class="support-details-body">
+
+      <div
+        style="
+          display:flex;
+          gap:8px;
+          flex-wrap:wrap;
+          margin-bottom:18px;
+        "
+      >
+
+        <button
+          class="secondary-action"
+          type="button"
+          onclick="addSACheckupItem(0)"
+        >
+          + OVERALL CHECKUP
+        </button>
+
+        <button
+          class="secondary-action"
+          type="button"
+          onclick="addSACheckupItem(1)"
+        >
+          + AIRCON
+        </button>
+
+        <button
+          class="secondary-action"
+          type="button"
+          onclick="addSACheckupItem(2)"
+        >
+          + COMPUTER SCAN
+        </button>
+
+        <button
+          class="secondary-action"
+          type="button"
+          onclick="addSACheckupItem(3)"
+        >
+          + PMS
+        </button>
+
+        <button
+          class="secondary-action"
+          type="button"
+          onclick="addSACustomQuotationItem()"
+        >
+          + CUSTOM ITEM
+        </button>
+
+      </div>
+
+      <div class="table-wrap">
+
+        <table class="data-table">
+
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Default</th>
+              <th>Quoted</th>
+              <th>Discount</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody id="saQuotationItemsBody">
+            <tr>
+              <td colspan="7" class="table-empty">
+                Add a checkup, product/service, or custom item.
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div
+        class="support-detail-grid"
+        style="margin-top:18px;"
+      >
+
+        <div class="support-detail-item">
+          <span>VAT Rate %</span>
+          <input
+            id="saQuotationVatRate"
+            type="number"
+            min="0"
+            step="0.01"
+            value="0"
+            oninput="updateSAQuotationTotal_()"
+          />
+        </div>
+
+        <div class="support-detail-item">
+          <span>Subtotal</span>
+          <strong id="saQuotationSubtotal">₱0.00</strong>
+        </div>
+
+        <div class="support-detail-item">
+          <span>Discount</span>
+          <strong id="saQuotationDiscount">₱0.00</strong>
+        </div>
+
+        <div class="support-detail-item">
+          <span>VAT</span>
+          <strong id="saQuotationVat">₱0.00</strong>
+        </div>
+
+        <div class="support-detail-item">
+          <span>Grand Total</span>
+          <strong id="saQuotationGrand">₱0.00</strong>
+        </div>
+
+      </div>
+
+      <div class="crm-modal-footer">
+
+        <button
+          class="secondary-action"
+          type="button"
+          onclick="document.getElementById('saQuotationModal').classList.remove('show')"
+        >
+          CLOSE
+        </button>
+
+        <button
+          class="primary-action"
+          type="button"
+          onclick="saveSAQuotationDraft()"
+        >
+          SAVE DRAFT
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     SA RELEASE WORKSPACE MODAL
+========================================================= -->
+<div class="crm-modal" id="saReleaseModal">
+
+  <div
+    class="crm-modal-backdrop"
+    onclick="closeSARelease()"
+  ></div>
+
+  <div
+    class="crm-modal-card"
+    style="width:min(980px, 96vw);"
+  >
+
+    <div class="crm-modal-header">
+
+      <div>
+        <div class="dashboard-eyebrow">RELEASE WORKSPACE</div>
+
+        <div
+          class="crm-modal-title"
+          id="saReleaseCustomer"
+        >
+          —
+        </div>
+
+        <div
+          class="crm-modal-subtitle"
+          id="saReleaseOpportunityId"
+        >
+          —
+        </div>
+      </div>
+
+      <button
+        class="modal-close"
+        type="button"
+        onclick="closeSARelease()"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <form
+      id="saReleaseForm"
+      onsubmit="return false;"
+    >
+
+      <div class="support-details-body">
+
+        <div class="support-detail-grid">
+
+          <div class="support-detail-item">
+            <span>Vehicle</span>
+            <strong id="saReleaseVehicle">—</strong>
+          </div>
+
+          <div class="support-detail-item">
+            <span>Plate</span>
+            <strong id="saReleasePlate">—</strong>
+          </div>
+
+        </div>
+
+
+        <div class="lead-form-section-title">
+          Release / Payment
+        </div>
+
+        <div class="lead-form-grid">
+
+          <div class="form-group">
+            <label>Final Quotation Total</label>
+            <input
+              id="saReleaseFinalTotal"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+              oninput="updateSAReleaseTotals()"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Discount</label>
+            <input
+              id="saReleaseDiscount"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+              oninput="updateSAReleaseTotals()"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Waiver</label>
+            <input
+              id="saReleaseWaiver"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+              oninput="updateSAReleaseTotals()"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>VAT Amount</label>
+            <input
+              id="saReleaseVat"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+              oninput="updateSAReleaseTotals()"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Amount Received</label>
+            <input
+              id="saReleaseReceived"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+              oninput="updateSAReleaseTotals()"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select
+              id="saReleasePaymentMethod"
+              class="form-select"
+            >
+              <option value="">Select method</option>
+              <option value="Cash">Cash</option>
+              <option value="GCash">GCash</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Card">Card</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Reference</label>
+            <input
+              id="saReleasePaymentReference"
+              type="text"
+              placeholder="Reference number, if any"
+            />
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label>Payment / Release Remarks</label>
+          <textarea
+            id="saReleasePaymentRemarks"
+            class="form-textarea"
+            placeholder="Add release or payment notes..."
+          ></textarea>
+        </div>
+
+
+        <div class="support-detail-grid">
+
+          <div class="support-detail-item">
+            <span>Amount Due</span>
+            <strong id="saReleaseAmountDue">₱0.00</strong>
+          </div>
+
+          <div class="support-detail-item">
+            <span>Balance</span>
+            <strong id="saReleaseBalance">₱0.00</strong>
+          </div>
+
+        </div>
+
+
+        <div class="lead-form-section-title">
+          Additional Expense / Monetary Attachment
+        </div>
+
+        <div class="lead-form-grid">
+
+          <div class="form-group">
+            <label>Expense Type</label>
+            <select
+              id="saExpenseType"
+              class="form-select"
+            >
+              <option value="Supplier Purchase">Supplier Purchase</option>
+              <option value="Client Meal">Client Meal</option>
+              <option value="Shipping / Delivery">Shipping / Delivery</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Parking / Toll">Parking / Toll</option>
+              <option value="Consumables">Consumables</option>
+              <option value="Miscellaneous">Miscellaneous</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Subject</label>
+            <input
+              id="saExpenseSubject"
+              type="text"
+              placeholder="e.g. Client lunch, parts shipping"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Amount</label>
+            <input
+              id="saExpenseAmount"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Paid To / Supplier</label>
+            <input
+              id="saExpensePaidTo"
+              type="text"
+              placeholder="Supplier, courier, restaurant..."
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Supplier ID</label>
+            <input
+              id="saExpenseSupplierId"
+              type="text"
+              placeholder="Optional"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Payment Method</label>
+            <input
+              id="saExpensePaymentMethod"
+              type="text"
+              placeholder="Cash, GCash, etc."
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Reference No.</label>
+            <input
+              id="saExpenseReference"
+              type="text"
+              placeholder="Optional reference"
+            />
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex;gap:8px;align-items:center;">
+              <input
+                id="saExpenseChargeable"
+                type="checkbox"
+              />
+              Chargeable to Client
+            </label>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea
+            id="saExpenseDescription"
+            class="form-textarea"
+            placeholder="Expense details..."
+          ></textarea>
+        </div>
+
+        <div class="crm-modal-footer">
+
+          <button
+            class="secondary-action"
+            type="button"
+            onclick="addSAOpportunityExpense()"
+          >
+            ADD EXPENSE
+          </button>
+
+        </div>
+
+
+        <div class="lead-form-section-title">
+          Release Actions
+        </div>
+
+        <div class="support-description-card">
+          <div class="support-description-text">
+            Release is operationally separate from BM compliance review. The unit may be released first; internal documentation can be completed afterward.
+          </div>
+        </div>
+
+        <div class="crm-modal-footer">
+
+          <button
+            class="secondary-action"
+            type="button"
+            onclick="closeSARelease()"
+          >
+            CLOSE
+          </button>
+
+          <button
+            class="secondary-action"
+            id="saPrepareReleaseButton"
+            type="button"
+            onclick="prepareSARelease()"
+          >
+            PREPARE RELEASE
+          </button>
+
+          <button
+            class="primary-action"
+            id="saReleaseUnitButton"
+            type="button"
+            onclick="releaseSAUnit()"
+          >
+            RELEASE UNIT
+          </button>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
 <script src="config.js"></script>
 <script src="utils.js"></script>
 
@@ -2880,6 +3656,11 @@
 <script src="pm-leads.js"></script>
 <script src="requests.js"></script>
 <script src="support.js"></script>
+
+<script src="sa-dashboard.js"></script>
+<script src="sa-opportunities.js"></script>
+<script src="sa-quotations.js"></script>
+<script src="sa-release.js"></script>
 
 <script src="navigation.js"></script>
 
