@@ -984,33 +984,132 @@
 </div>
 </div>
 <div class="module-toolbar">
-<input class="module-search" id="leadSearch" oninput="filterLeadsTable()" placeholder="Search customer, contact, vehicle or plate..." type="text"/>
-<select class="module-filter" id="leadBranchFilter" onchange="filterLeadsTable()">
-<option value="">All Branches</option>
-<option value="UC-LP">UC Las Piñas</option>
-<option value="UC-MD">UC Mandaluyong</option>
-<option value="UC-QC">UC Quezon City</option>
-<option value="MM-MD">Mastermind Mandaluyong</option>
-</select>
-<select class="module-filter" id="leadStatusFilter" onchange="filterLeadsTable()">
-<option value="">All Statuses</option>
-<option value="Interested">Interested</option>
-<option value="Follow Up">Follow Up</option>
-<option value="Not Interested">Not Interested</option>
-<option value="Booked">Booked</option>
-<option value="Remind">Remind</option>
-<option value="Cancelled">Cancelled</option>
-<option value="Rescheduled">Rescheduled</option>
-<option value="No Show">No Show</option>
-</select>
-</div>
-<!-- SERVICE FILTER - DITO ILALAGAY -->
-<div class="filter-group">
-<label>Service</label>
-<select class="form-select" id="leadServiceFilter" onchange="filterLeadsTable()">
-<option value="">All Services</option>
-<!-- service options dito -->
-</select>
+
+  <input
+    class="module-search"
+    id="leadSearch"
+    type="text"
+    placeholder="Search customer, contact, vehicle or plate..."
+    oninput="filterLeadsTable()"
+  />
+
+
+  <select
+    class="module-filter"
+    id="leadBranchFilter"
+    onchange="filterLeadsTable()"
+  >
+    <option value="">
+      All Branches
+    </option>
+
+    <option value="UC-LP">
+      UC Las Piñas
+    </option>
+
+    <option value="UC-MD">
+      UC Mandaluyong
+    </option>
+
+    <option value="UC-QC">
+      UC Quezon City
+    </option>
+
+    <option value="MM-MD">
+      Mastermind Mandaluyong
+    </option>
+  </select>
+
+
+  <select
+    class="module-filter"
+    id="leadStatusFilter"
+    onchange="filterLeadsTable()"
+  >
+    <option value="">
+      All Statuses
+    </option>
+
+    <option value="Interested">
+      Interested
+    </option>
+
+    <option value="Follow Up">
+      Follow Up
+    </option>
+
+    <option value="Not Interested">
+      Not Interested
+    </option>
+
+    <option value="Booked">
+      Booked
+    </option>
+
+    <option value="Remind">
+      Remind
+    </option>
+
+    <option value="Cancelled">
+      Cancelled
+    </option>
+
+    <option value="Rescheduled">
+      Rescheduled
+    </option>
+
+    <option value="No Show">
+      No Show
+    </option>
+  </select>
+
+
+  <select
+    class="module-filter"
+    id="leadServiceFilter"
+    onchange="filterLeadsTable()"
+  >
+    <option value="">
+      All Services
+    </option>
+
+    <option value="Vehicle System Checkup">
+      Vehicle System Checkup
+    </option>
+
+    <option value="Computer Diagnostic Scan">
+      Computer Diagnostic Scan
+    </option>
+
+    <option value="Aircon Checkup">
+      Aircon Checkup
+    </option>
+
+    <option value="Preventive Maintenance Service">
+      Preventive Maintenance Service
+    </option>
+
+    <option value="Engine Checkup / Repair">
+      Engine Checkup / Repair
+    </option>
+
+    <option value="Electrical Checkup / Repair">
+      Electrical Checkup / Repair
+    </option>
+
+    <option value="Suspension Checkup / Repair">
+      Suspension Checkup / Repair
+    </option>
+
+    <option value="Steering Checkup / Repair">
+      Steering Checkup / Repair
+    </option>
+
+    <option value="Underchassis Checkup / Repair">
+      Underchassis Checkup / Repair
+    </option>
+  </select>
+
 </div>
 <div class="leads-table-card">
 <div class="table-scroll">
