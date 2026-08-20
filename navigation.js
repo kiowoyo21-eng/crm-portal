@@ -216,18 +216,24 @@ function selectModule(
       "reportsView"
     );
 
+  const supportView =
+  document.getElementById(
+    "supportView"
+  );
+
 
   // =========================
   // HIDE ALL VIEWS
   // =========================
 
   [
-    dashboardView,
-    leadsView,
-    appointmentsView,
-    requestsView,
-    reportsView
-  ]
+  dashboardView,
+  leadsView,
+  appointmentsView,
+  requestsView,
+  reportsView,
+  supportView
+]
     .forEach(
       function(view) {
 
@@ -401,6 +407,38 @@ function selectModule(
     return;
 
   }
+
+
+  // =========================
+// SHARED SUPPORT
+// =========================
+
+if (
+  moduleName === "Support 🎫" ||
+  moduleName === "Support"
+) {
+
+  if (supportView) {
+
+    supportView.style.display =
+      "block";
+
+  }
+
+
+  if (
+    typeof loadSupportTickets ===
+      "function"
+  ) {
+
+    loadSupportTickets();
+
+  }
+
+
+  return;
+
+}
 
 
   // =========================
