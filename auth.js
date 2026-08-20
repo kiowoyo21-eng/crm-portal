@@ -479,7 +479,22 @@ if (
 
 }
 
-showPortal(savedUser);
+if (
+  typeof showPortal ===
+  "function"
+) {
+
+  showPortal(
+    savedUser
+  );
+
+} else {
+
+  console.error(
+    "Unable to restore session: showPortal is not available."
+  );
+
+}
 
 
   } catch (error) {
