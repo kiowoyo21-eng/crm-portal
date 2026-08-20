@@ -1,90 +1,82 @@
+const CRM_ROLE_MENUS = {
+
+  PM: [
+    "Dashboard",
+    "Leads",
+    "Appointments",
+    "Requests",
+    "Reports"
+  ],
+
+  SA: [
+    "Dashboard",
+    "Appointments",
+    "Opportunities",
+    "Suppliers",
+    "Products",
+    "Reports",
+    "Requests"
+  ],
+
+  BM: [
+    "Dashboard",
+    "Appointments",
+    "Opportunities",
+    "Suppliers",
+    "Products",
+    "Employees / Attendance",
+    "Approvals / Requests",
+    "Reports",
+    "Requests"
+  ],
+
+  HR: [
+    "Dashboard",
+    "Employees",
+    "Attendance / DTR",
+    "Requests",
+    "Payroll",
+    "Reports"
+  ],
+
+  IT: [
+    "Dashboard",
+    "Users / Accounts",
+    "Roles & Permissions",
+    "Branches",
+    "System Configuration",
+    "System Logs",
+    "Reports"
+  ],
+
+  Mechanic: [
+    "Dashboard",
+    "Opportunities",
+    "Requests"
+  ],
+
+  Direk: [
+    "Dashboard",
+    "Appointments",
+    "Opportunities",
+    "Branches",
+    "Employees",
+    "Products",
+    "Suppliers",
+    "Reports",
+    "Requests"
+  ]
+
+};
+
 function buildSidebar(role) {
 
-  const menu =
-    document.getElementById(
-      "sidebarMenu"
-    );
-
-  menu.innerHTML = "";
 
 
-  const menus = {
-
-    PM: [
-      "Dashboard",
-      "Leads",
-      "Appointments",
-      "Requests",
-      "Reports"
-    ],
-
-    SA: [
-      "Dashboard",
-      "Appointments",
-      "Opportunities",
-      "Suppliers",
-      "Products",
-      "Reports",
-      "Requests"
-    ],
-
-    BM: [
-      "Dashboard",
-      "Appointments",
-      "Opportunities",
-      "Suppliers",
-      "Products",
-      "Employees / Attendance",
-      "Approvals / Requests",
-      "Reports",
-      "Requests"
-    ],
-
-    HR: [
-      "Dashboard",
-      "Employees",
-      "Attendance / DTR",
-      "Requests",
-      "Payroll",
-      "Reports"
-    ],
-
-    IT: [
-      "Dashboard",
-      "Users / Accounts",
-      "Roles & Permissions",
-      "Branches",
-      "System Configuration",
-      "System Logs",
-      "Reports"
-    ],
-
-    Mechanic: [
-      "Dashboard",
-      "Opportunities",
-      "Requests"
-    ],
-
-    Direk: [
-      "Dashboard",
-      "Appointments",
-      "Opportunities",
-      "Branches",
-      "Employees",
-      "Products",
-      "Suppliers",
-      "Reports",
-      "Requests"
-    ]
-
-  };
-
-
-  const selectedMenu =
-    menus[role] || [
-      "Dashboard"
-    ];
-
+ const selectedMenu =
+  CRM_ROLE_MENUS[role] || [
+    "Dashboard"
+  ];
 
   selectedMenu.forEach(
     function(
