@@ -158,6 +158,11 @@ function renderRequestsTable() {
     );
 
 
+  if (!tableBody) {
+    return;
+  }
+
+
   if (!currentRequests.length) {
 
     tableBody.innerHTML = `
@@ -177,99 +182,238 @@ function renderRequestsTable() {
   }
 
 
+  // ========================================
+  // CURRENT USER ROLE
+  // ========================================
+
+  const currentRole =
+    String(
+      currentUser &&
+      (
+        currentUser.systemRole ||
+        currentUser.role
+      ) ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+
+
   tableBody.innerHTML =
     currentRequests
-      .map(function(request) {
+      .map(
+        function(request) {
 
-        const requestId =
-          escapeHtml(
-            request.requestId || "—"
-          );
-
-        const type =
-          escapeHtml(
-            request.requestType || "—"
-          );
-
-        const subject =
-          escapeHtml(
-            request.subject || "—"
-          );
-
-        const priority =
-          escapeHtml(
-            request.priority || "Normal"
-          );
-
-        const status =
-          escapeHtml(
-            request.status || "Pending"
-          );
-
-        const createdAt =
-          escapeHtml(
-            request.createdAt || "—"
-          );
-
-        const updatedBy =
-          escapeHtml(
-            request.updatedBy || "—"
-          );
+          const requestId =
+            escapeHtml(
+              request.requestId || "—"
+            );
 
 
-        return `
-          <tr>
+          const type =
+            escapeHtml(
+              request.requestType || "—"
+            );
 
-            <td>
-              ${requestId}
-            </td>
 
-            <td>
-              ${type}
-            </td>
+          const subject =
+            escapeHtml(
+              request.subject || "—"
+            );
 
-            <td>
-              ${subject}
-            </td>
 
-            <td>
-              <span class="request-priority-badge">
-                ${priority}
-              </span>
-            </td>
+          const priority =
+            escapeHtml(
+              request.priority || "Normal"
+            );
 
-            <td>
-              <span class="request-status-badge">
-                ${status}
-              </span>
-            </td>
 
-            <td>
-              ${createdAt}
-            </td>
+          const status =
+            escapeHtml(
+              request.status || "Pending"
+            );
 
-            <td>
-              ${updatedBy}
-            </td>
 
-            <td>
+          const createdAt =
+            escapeHtml(
+              request.createdAt || "—"
+            );
+
+
+          const updatedBy =
+            escapeHtml(
+              request.updatedBy || "—"
+            );
+
+
+          const targetRole =
+            String(
+              request.targetRole || ""
+            )
+              .trim()
+              .toUpperCase();
+
+
+          const actionRequired =
+            String(
+              request.actionRequired ||
+              "PROCESS"
+            )
+              .trim()
+              .toUpperCase();
+
+
+          const requestStatus =
+            String(
+              request.status ||
+              "Pending"
+            ).trim();
+
+
+          // ==================================
+          // PROCESSING PERMISSION
+          // ==================================
+
+          let canProcess =
+            false;
+
+
+          // HR handles HR requests
+          if (
+            currentRole === "HR" &&
+            targetRole === "HR"
+          ) {
+
+            canProcess =
+              true;
+
+          }
+
+
+          // Direk can process everything
+          if (
+            currentRole === "DIREK"
+          ) {
+
+            canProcess =
+              true;
+
+          }
+
+
+          // ==================================
+          // FINAL STATUS?
+          // ==================================
+
+          const isFinal =
+            requestStatus === "Resolved" ||
+            requestStatus === "Approved" ||
+            requestStatus === "Rejected";
+
+
+          // ==================================
+          // ACTION BUTTONS
+          // ==================================
+
+          let actionButtons = `
+
+            <button
+              type="button"
+              class="secondary-action"
+              onclick="openRequestDetails(
+                '${request.requestId}'
+              )"
+            >
+              VIEW
+            </button>
+
+          `;
+
+
+          if (
+            canProcess &&
+            !isFinal
+          ) {
+
+            const actionLabel =
+              actionRequired ===
+              "APPROVAL"
+                ? "REVIEW"
+                : "PROCESS";
+
+
+            actionButtons += `
 
               <button
                 type="button"
-                class="secondary-action"
+                class="primary-action"
                 onclick="openRequestDetails(
                   '${request.requestId}'
                 )"
               >
-                VIEW
+                ${actionLabel}
               </button>
 
-            </td>
+            `;
 
-          </tr>
-        `;
+          }
 
-      })
+
+          return `
+            <tr>
+
+              <td>
+                ${requestId}
+              </td>
+
+              <td>
+                ${type}
+              </td>
+
+              <td>
+                ${subject}
+              </td>
+
+              <td>
+                <span class="request-priority-badge">
+                  ${priority}
+                </span>
+              </td>
+
+              <td>
+                <span class="request-status-badge">
+                  ${status}
+                </span>
+              </td>
+
+              <td>
+                ${createdAt}
+              </td>
+
+              <td>
+                ${updatedBy}
+              </td>
+
+              <td>
+
+                <div
+                  style="
+                    display:flex;
+                    gap:8px;
+                    align-items:center;
+                    flex-wrap:wrap;
+                  "
+                >
+                  ${actionButtons}
+                </div>
+
+              </td>
+
+            </tr>
+          `;
+
+        }
+      )
       .join("");
 
 }
