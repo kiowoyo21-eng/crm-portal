@@ -466,18 +466,20 @@ function restoreSession() {
     }
 
 
-    currentUser =
-      savedUser;
+currentUser = savedUser;
 
+// Reload vehicle suggestions after refresh
+// only when pm-leads.js is already available
+if (
+  typeof loadVehicleCatalog ===
+  "function"
+) {
 
-    // Reload vehicle suggestions
-    // after browser refresh.
-    loadVehicleCatalog();
+  loadVehicleCatalog();
 
+}
 
-    showPortal(
-      savedUser
-    );
+showPortal(savedUser);
 
 
   } catch (error) {
