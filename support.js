@@ -845,31 +845,6 @@ function openNewSupportTicketModal() {
       "Normal";
   }
 
-
-  if (moduleInput) {
-
-    moduleInput.value =
-      pageTitle
-        ? String(
-            pageTitle.textContent ||
-            ""
-          ).trim()
-        : "";
-
-  }
-
-
-  if (viewInput) {
-
-    viewInput.value =
-      moduleInput &&
-      moduleInput.value
-        ? moduleInput.value
-        : "";
-
-  }
-
-
   if (message) {
 
     message.className =
