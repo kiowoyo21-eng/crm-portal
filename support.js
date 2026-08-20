@@ -6,6 +6,345 @@ let currentSupportTickets = [];
 let filteredSupportTickets = [];
 let selectedSupportTicketId = null;
 
+const SUPPORT_MODULE_VIEWS = {
+
+  "Dashboard": [
+    "Dashboard Overview",
+    "KPI Cards",
+    "Today's Appointments",
+    "Appointment Weekly"
+  ],
+
+  "Leads": [
+    "Lead List",
+    "Add Lead",
+    "Edit Lead",
+    "Lead Filters",
+    "Vehicle Search"
+  ],
+
+  "Appointments": [
+    "Appointment Calendar",
+    "Appointment Date View",
+    "Appointment Details",
+    "Booking",
+    "Rescheduling"
+  ],
+
+  "Requests": [
+    "Request List",
+    "New Request",
+    "Request Details"
+  ],
+
+  "Reports": [
+    "Reports Overview",
+    "Report Filters",
+    "Appointment Outcomes",
+    "Branch Performance",
+    "Inquiry Source Performance",
+    "PM Performance",
+    "Booked By Performance",
+    "Commission Report",
+    "Follow-Up Report",
+    "Vehicle Insights"
+  ],
+
+  "Opportunities": [
+    "Opportunity List",
+    "Opportunity Details",
+    "Create Opportunity",
+    "Quotation"
+  ],
+
+  "Suppliers": [
+    "Supplier List",
+    "Add Supplier",
+    "Edit Supplier"
+  ],
+
+  "Products": [
+    "Product List",
+    "Add Product",
+    "Edit Product",
+    "Inventory"
+  ],
+
+  "Employees / Attendance": [
+    "Employee List",
+    "Employee Details",
+    "Attendance",
+    "DTR"
+  ],
+
+  "Approvals / Requests": [
+    "Approval List",
+    "Request Review",
+    "Request Details"
+  ],
+
+  "Employees": [
+    "Employee List",
+    "Employee Details",
+    "Add Employee",
+    "Edit Employee"
+  ],
+
+  "Attendance / DTR": [
+    "Attendance List",
+    "Daily Time Record",
+    "Attendance Details"
+  ],
+
+  "Payroll": [
+    "Payroll List",
+    "Payroll Details",
+    "Payroll Processing"
+  ],
+
+  "Users / Accounts": [
+    "User List",
+    "Create Account",
+    "Edit Account",
+    "Login / Authentication"
+  ],
+
+  "Roles & Permissions": [
+    "Role List",
+    "Permissions",
+    "Access Control"
+  ],
+
+  "Branches": [
+    "Branch List",
+    "Branch Details",
+    "Branch Configuration"
+  ],
+
+  "System Configuration": [
+    "General Settings",
+    "System Configuration"
+  ],
+
+  "System Logs": [
+    "System Log List",
+    "Log Details",
+    "Log Filters"
+  ],
+
+  "Other": [
+    "General CRM",
+    "Navigation",
+    "Interface / Design",
+    "Other"
+  ]
+
+};
+
+function populateSupportModuleOptions() {
+
+  const moduleSelect =
+    document.getElementById(
+      "newSupportModule"
+    );
+
+  const viewSelect =
+    document.getElementById(
+      "newSupportViewName"
+    );
+
+
+  if (
+    !moduleSelect ||
+    !viewSelect
+  ) {
+    return;
+  }
+
+
+  moduleSelect.innerHTML = `
+    <option value="">
+      Select module
+    </option>
+  `;
+
+
+  viewSelect.innerHTML = `
+    <option value="">
+      Select module first
+    </option>
+  `;
+
+
+  viewSelect.disabled = true;
+
+
+  if (
+    !currentUser ||
+    !currentUser.systemRole
+  ) {
+    return;
+  }
+
+
+  const role =
+    String(
+      currentUser.systemRole || ""
+    ).trim();
+
+
+  const modules =
+    (
+      CRM_ROLE_MENUS[role] || []
+    )
+      .filter(
+        function(moduleName) {
+
+          return (
+            moduleName !== "Support" &&
+            moduleName !== "Support 🎫"
+          );
+
+        }
+      );
+
+
+  modules.forEach(
+    function(moduleName) {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        moduleName;
+
+      option.textContent =
+        moduleName;
+
+      moduleSelect.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  const otherOption =
+    document.createElement(
+      "option"
+    );
+
+  otherOption.value =
+    "Other";
+
+  otherOption.textContent =
+    "Other";
+
+  moduleSelect.appendChild(
+    otherOption
+  );
+
+}
+
+function updateSupportViewOptions() {
+
+  const moduleSelect =
+    document.getElementById(
+      "newSupportModule"
+    );
+
+  const viewSelect =
+    document.getElementById(
+      "newSupportViewName"
+    );
+
+
+  if (
+    !moduleSelect ||
+    !viewSelect
+  ) {
+    return;
+  }
+
+
+  const moduleName =
+    String(
+      moduleSelect.value || ""
+    ).trim();
+
+
+  viewSelect.innerHTML =
+    "";
+
+
+  if (!moduleName) {
+
+    viewSelect.disabled =
+      true;
+
+    viewSelect.innerHTML = `
+      <option value="">
+        Select module first
+      </option>
+    `;
+
+    return;
+  }
+
+
+  const views =
+    SUPPORT_MODULE_VIEWS[
+      moduleName
+    ] || [
+      "General"
+    ];
+
+
+  viewSelect.disabled =
+    false;
+
+
+  const defaultOption =
+    document.createElement(
+      "option"
+    );
+
+  defaultOption.value =
+    "";
+
+  defaultOption.textContent =
+    "Select view";
+
+  viewSelect.appendChild(
+    defaultOption
+  );
+
+
+  views.forEach(
+    function(viewName) {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        viewName;
+
+      option.textContent =
+        viewName;
+
+      viewSelect.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+
 
 /* =========================================================
    LOAD SUPPORT
@@ -492,6 +831,8 @@ function openNewSupportTicketModal() {
     form.reset();
   }
 
+   populateSupportModuleOptions();
+
 
   const priority =
     document.getElementById(
@@ -503,29 +844,6 @@ function openNewSupportTicketModal() {
     priority.value =
       "Normal";
   }
-
-
-  /*
-   * Automatically use the current
-   * CRM page/module when possible.
-   */
-
-  const moduleInput =
-    document.getElementById(
-      "newSupportModule"
-    );
-
-
-  const viewInput =
-    document.getElementById(
-      "newSupportViewName"
-    );
-
-
-  const pageTitle =
-    document.getElementById(
-      "pageTitle"
-    );
 
 
   if (moduleInput) {
