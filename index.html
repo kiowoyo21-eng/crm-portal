@@ -2387,95 +2387,339 @@
      REQUEST DETAILS MODAL
      ========================= -->
 <div class="crm-modal" id="requestDetailsModal">
-<div class="crm-modal-backdrop" onclick="closeRequestDetails()"></div>
-<div class="crm-modal-card">
-<div class="crm-modal-header">
-<div>
-<div class="dashboard-eyebrow">
+
+  <div
+    class="crm-modal-backdrop"
+    onclick="closeRequestDetails()">
+  </div>
+
+  <div class="crm-modal-card">
+
+    <div class="crm-modal-header">
+
+      <div>
+
+        <div class="dashboard-eyebrow">
           REQUEST DETAILS
         </div>
-<div class="crm-modal-title" id="requestDetailsTitle">
+
+        <div
+          class="crm-modal-title"
+          id="requestDetailsTitle">
           —
         </div>
-<div class="crm-modal-subtitle" id="requestDetailsId">
+
+        <div
+          class="crm-modal-subtitle"
+          id="requestDetailsId">
           —
         </div>
-</div>
-<button class="modal-close" onclick="closeRequestDetails()" type="button">
+
+      </div>
+
+      <button
+        class="modal-close"
+        onclick="closeRequestDetails()"
+        type="button">
         ×
       </button>
-</div>
-<div style="padding:24px;">
-<div class="lead-form-grid">
-<div class="form-group">
-<label>Request Type</label>
-<div id="requestDetailsType">
+
+    </div>
+
+
+    <div class="support-details-body">
+
+      <!-- REQUEST INFORMATION -->
+
+      <div class="lead-form-grid">
+
+        <div class="form-group">
+          <label>Request Type</label>
+          <div id="requestDetailsType">
             —
           </div>
-</div>
-<div class="form-group">
-<label>Priority</label>
-<div id="requestDetailsPriority">
+        </div>
+
+        <div class="form-group">
+          <label>Priority</label>
+          <div id="requestDetailsPriority">
             —
           </div>
-</div>
-<div class="form-group">
-<label>Status</label>
-<div id="requestDetailsStatus">
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <div id="requestDetailsStatus">
             —
           </div>
-</div>
-<div class="form-group">
-<label>Branch</label>
-<div id="requestDetailsBranch">
+        </div>
+
+        <div class="form-group">
+          <label>Action Required</label>
+          <div id="requestDetailsActionRequired">
             —
           </div>
-</div>
-<div class="form-group">
-<label>Created</label>
-<div id="requestDetailsCreated">
+        </div>
+
+        <div class="form-group">
+          <label>Branch</label>
+          <div id="requestDetailsBranch">
             —
           </div>
-</div>
-<div class="form-group">
-<label>Created By</label>
-<div id="requestDetailsCreatedBy">
-    —
-  </div>
-</div>
-</div>
-<div class="form-group">
-<label>Description</label>
-<div id="requestDetailsDescription" style="
+        </div>
+
+        <div class="form-group">
+          <label>Created</label>
+          <div id="requestDetailsCreated">
+            —
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Created By</label>
+          <div id="requestDetailsCreatedBy">
+            —
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Target Role</label>
+          <div id="requestDetailsTargetRole">
+            —
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Assigned To</label>
+          <div id="requestDetailsAssignedTo">
+            —
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- DESCRIPTION -->
+
+      <div class="form-group">
+
+        <label>Description</label>
+
+        <div
+          id="requestDetailsDescription"
+          style="
             white-space:pre-wrap;
             line-height:1.6;
           ">
           —
         </div>
-</div>
-<div id="requestResolutionSection" style="display:none;">
-<div class="lead-form-grid">
-<div class="form-group">
-<label>Resolved By</label>
-<div id="requestDetailsResolvedBy">
+
+      </div>
+
+
+      <!-- PROCESSING / APPROVAL CONTROLS -->
+
+      <div
+        id="requestProcessingSection"
+        style="display:none;">
+
+        <div class="lead-form-section-title">
+          Request Processing
+        </div>
+
+        <div class="lead-form-grid">
+
+          <div class="form-group">
+
+            <label>Status *</label>
+
+            <select
+              class="form-select"
+              id="requestProcessStatus">
+            </select>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>Assigned To</label>
+
+            <input
+              id="requestProcessAssignedTo"
+              type="text"
+              placeholder="Employee name"
+            />
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="form-group"
+          id="requestResolutionRemarksGroup">
+
+          <label>
+            Resolution / Processing Remarks
+          </label>
+
+          <textarea
+            class="form-textarea"
+            id="requestProcessResolutionRemarks"
+            placeholder="Enter processing or resolution details...">
+          </textarea>
+
+        </div>
+
+
+        <div
+          class="form-group"
+          id="requestDecisionRemarksGroup"
+          style="display:none;">
+
+          <label>
+            Approval / Decision Remarks
+          </label>
+
+          <textarea
+            class="form-textarea"
+            id="requestProcessDecisionRemarks"
+            placeholder="Enter approval or rejection remarks...">
+          </textarea>
+
+        </div>
+
+
+        <div
+          class="modal-message"
+          id="requestProcessMessage">
+        </div>
+
+      </div>
+
+
+      <!-- FINAL PROCESSING INFORMATION -->
+
+      <div
+        id="requestResolutionSection"
+        style="display:none;">
+
+        <div class="lead-form-section-title">
+          Processing Information
+        </div>
+
+        <div class="lead-form-grid">
+
+          <div class="form-group">
+
+            <label>Resolved By</label>
+
+            <div id="requestDetailsResolvedBy">
               —
             </div>
-</div>
-<div class="form-group">
-<label>Resolved At</label>
-<div id="requestDetailsResolvedAt">
+
+          </div>
+
+          <div class="form-group">
+
+            <label>Resolved At</label>
+
+            <div id="requestDetailsResolvedAt">
               —
             </div>
-</div>
-</div>
-</div>
-<div class="crm-modal-footer">
-<button class="secondary-action" onclick="closeRequestDetails()" type="button">
+
+          </div>
+
+          <div class="form-group">
+
+            <label>Processed By</label>
+
+            <div id="requestDetailsProcessedBy">
+              —
+            </div>
+
+          </div>
+
+          <div class="form-group">
+
+            <label>Processed At</label>
+
+            <div id="requestDetailsProcessedAt">
+              —
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="form-group"
+          id="requestDetailsResolutionRemarksGroup"
+          style="display:none;">
+
+          <label>Resolution Remarks</label>
+
+          <div
+            id="requestDetailsResolutionRemarks"
+            style="
+              white-space:pre-wrap;
+              line-height:1.6;
+            ">
+            —
+          </div>
+
+        </div>
+
+
+        <div
+          class="form-group"
+          id="requestDetailsDecisionRemarksGroup"
+          style="display:none;">
+
+          <label>Decision Remarks</label>
+
+          <div
+            id="requestDetailsDecisionRemarks"
+            style="
+              white-space:pre-wrap;
+              line-height:1.6;
+            ">
+            —
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- FOOTER -->
+
+      <div class="crm-modal-footer">
+
+        <button
+          class="secondary-action"
+          onclick="closeRequestDetails()"
+          type="button">
           CLOSE
         </button>
-</div>
-</div>
-</div>
+
+        <button
+          class="primary-action"
+          id="requestProcessButton"
+          onclick="submitRequestUpdate()"
+          type="button"
+          style="display:none;">
+          UPDATE REQUEST
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 <!-- =========================
      NEW REQUEST MODAL
