@@ -11,9 +11,11 @@ const CRM_ROLE_MENUS = {
   SA: [
     "Dashboard",
     "Appointments",
+    "Leads",
     "Opportunities",
     "Suppliers",
     "Products",
+    "Inventory",
     "Reports",
     "Requests"
   ],
@@ -21,9 +23,11 @@ const CRM_ROLE_MENUS = {
   BM: [
     "Dashboard",
     "Appointments",
+    "Leads",
     "Opportunities",
     "Suppliers",
     "Products",
+    "Inventory",
     "Employees / Attendance",
     "Approvals / Requests",
     "Reports",
@@ -58,16 +62,23 @@ const CRM_ROLE_MENUS = {
   Direk: [
     "Dashboard",
     "Appointments",
+    "Leads",
     "Opportunities",
     "Branches",
     "Employees",
     "Products",
     "Suppliers",
+    "Inventory",
     "Reports",
     "Requests"
   ]
 
 };
+
+
+// ========================================
+// BUILD SIDEBAR
+// ========================================
 
 function buildSidebar(role) {
 
@@ -82,7 +93,8 @@ function buildSidebar(role) {
   }
 
 
-  menu.innerHTML = "";
+  menu.innerHTML =
+    "";
 
 
   const selectedMenu =
@@ -102,11 +114,14 @@ function buildSidebar(role) {
           "button"
         );
 
+
       button.className =
         "nav-item";
 
 
-      if (index === 0) {
+      if (
+        index === 0
+      ) {
 
         button.classList.add(
           "active"
@@ -138,6 +153,8 @@ function buildSidebar(role) {
   );
 
 }
+
+
 // ========================================
 // MODULE SELECTION
 // ========================================
@@ -153,7 +170,9 @@ function selectModule(
     );
 
 
-  if (pageTitle) {
+  if (
+    pageTitle
+  ) {
 
     pageTitle.textContent =
       moduleName;
@@ -161,9 +180,9 @@ function selectModule(
   }
 
 
-  // =========================
+  // ========================================
   // SIDEBAR ACTIVE STATE
-  // =========================
+  // ========================================
 
   document
     .querySelectorAll(
@@ -180,7 +199,9 @@ function selectModule(
     );
 
 
-  if (button) {
+  if (
+    button
+  ) {
 
     button.classList.add(
       "active"
@@ -189,57 +210,95 @@ function selectModule(
   }
 
 
-  // =========================
+  // ========================================
+  // CURRENT ROLE
+  // ========================================
+
+  const currentRole =
+    String(
+      currentUser &&
+      (
+        currentUser.systemRole ||
+        currentUser.role
+      ) ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+
+
+  // ========================================
   // AVAILABLE VIEWS
-  // =========================
+  // ========================================
 
   const dashboardView =
     document.getElementById(
       "dashboardView"
     );
 
+
+  const saDashboardView =
+    document.getElementById(
+      "saDashboardView"
+    );
+
+
   const leadsView =
     document.getElementById(
       "leadsView"
     );
+
 
   const appointmentsView =
     document.getElementById(
       "appointmentsView"
     );
 
+
+  const saOpportunitiesView =
+    document.getElementById(
+      "saOpportunitiesView"
+    );
+
+
   const requestsView =
     document.getElementById(
       "requestsView"
     );
+
 
   const reportsView =
     document.getElementById(
       "reportsView"
     );
 
+
   const supportView =
-  document.getElementById(
-    "supportView"
-  );
+    document.getElementById(
+      "supportView"
+    );
 
 
-  // =========================
-  // HIDE ALL VIEWS
-  // =========================
+  // ========================================
+  // HIDE ALL BUILT VIEWS
+  // ========================================
 
   [
-  dashboardView,
-  leadsView,
-  appointmentsView,
-  requestsView,
-  reportsView,
-  supportView
-]
+    dashboardView,
+    saDashboardView,
+    leadsView,
+    appointmentsView,
+    saOpportunitiesView,
+    requestsView,
+    reportsView,
+    supportView
+  ]
     .forEach(
       function(view) {
 
-        if (view) {
+        if (
+          view
+        ) {
 
           view.style.display =
             "none";
@@ -250,16 +309,50 @@ function selectModule(
     );
 
 
-  // =========================
+  // ========================================
   // DASHBOARD
-  // =========================
+  // ========================================
 
   if (
     moduleName ===
     "Dashboard"
   ) {
 
-    if (dashboardView) {
+    // SA gets the new production dashboard.
+    if (
+      currentRole ===
+      "SA"
+    ) {
+
+      if (
+        saDashboardView
+      ) {
+
+        saDashboardView.style.display =
+          "block";
+
+      }
+
+
+      if (
+        typeof loadSADashboard ===
+        "function"
+      ) {
+
+        loadSADashboard();
+
+      }
+
+
+      return;
+
+    }
+
+
+    // All other roles keep the existing dashboard for now.
+    if (
+      dashboardView
+    ) {
 
       dashboardView.style.display =
         "block";
@@ -283,16 +376,18 @@ function selectModule(
   }
 
 
-  // =========================
-  // PM LEADS
-  // =========================
+  // ========================================
+  // LEADS
+  // ========================================
 
   if (
     moduleName ===
     "Leads"
   ) {
 
-    if (leadsView) {
+    if (
+      leadsView
+    ) {
 
       leadsView.style.display =
         "block";
@@ -315,16 +410,18 @@ function selectModule(
   }
 
 
-  // =========================
-  // SHARED APPOINTMENTS
-  // =========================
+  // ========================================
+  // APPOINTMENTS
+  // ========================================
 
   if (
     moduleName ===
     "Appointments"
   ) {
 
-    if (appointmentsView) {
+    if (
+      appointmentsView
+    ) {
 
       appointmentsView.style.display =
         "block";
@@ -347,16 +444,52 @@ function selectModule(
   }
 
 
-  // =========================
-  // SHARED REQUESTS
-  // =========================
+  // ========================================
+  // OPPORTUNITIES
+  // ========================================
+
+  if (
+    moduleName ===
+    "Opportunities"
+  ) {
+
+    if (
+      saOpportunitiesView
+    ) {
+
+      saOpportunitiesView.style.display =
+        "block";
+
+    }
+
+
+    if (
+      typeof loadSAOpportunities ===
+        "function"
+    ) {
+
+      loadSAOpportunities();
+
+    }
+
+
+    return;
+
+  }
+
+
+  // ========================================
+  // REQUESTS
+  // ========================================
 
   if (
     moduleName ===
     "Requests"
   ) {
 
-    if (requestsView) {
+    if (
+      requestsView
+    ) {
 
       requestsView.style.display =
         "block";
@@ -379,16 +512,18 @@ function selectModule(
   }
 
 
-  // =========================
-  // PM REPORTS
-  // =========================
+  // ========================================
+  // REPORTS
+  // ========================================
 
   if (
     moduleName ===
     "Reports"
   ) {
 
-    if (reportsView) {
+    if (
+      reportsView
+    ) {
 
       reportsView.style.display =
         "block";
@@ -396,7 +531,16 @@ function selectModule(
     }
 
 
+    /*
+     * PM reports are still the only built
+     * report view right now.
+     *
+     * Do not call it for SA/BM/Direk.
+     */
+
     if (
+      currentRole ===
+      "PM" &&
       typeof loadPMReports ===
         "function"
     ) {
@@ -411,45 +555,100 @@ function selectModule(
   }
 
 
-  // =========================
-// SHARED SUPPORT
-// =========================
-
-if (
-  moduleName === "Support 🎫" ||
-  moduleName === "Support"
-) {
-
-  if (supportView) {
-
-    supportView.style.display =
-      "block";
-
-  }
-
+  // ========================================
+  // SHARED SUPPORT
+  // ========================================
 
   if (
-    typeof loadSupportTickets ===
-      "function"
+    moduleName ===
+      "Support 🎫" ||
+    moduleName ===
+      "Support"
   ) {
 
-    loadSupportTickets();
+    if (
+      supportView
+    ) {
+
+      supportView.style.display =
+        "block";
+
+    }
+
+
+    if (
+      typeof loadSupportTickets ===
+        "function"
+    ) {
+
+      loadSupportTickets();
+
+    }
+
+
+    return;
 
   }
 
 
-  return;
-
-}
-
-
-  // =========================
+  // ========================================
   // MODULE NOT BUILT YET
-  // =========================
+  // ========================================
 
   console.log(
     "Module view not built yet:",
     moduleName
+  );
+
+}
+
+
+// ========================================
+// DASHBOARD → MODULE SHORTCUT
+// ========================================
+
+function selectDashboardModule(
+  moduleName
+) {
+
+  const menuButtons =
+    document.querySelectorAll(
+      "#sidebarMenu .nav-item"
+    );
+
+
+  for (
+    let i = 0;
+    i < menuButtons.length;
+    i++
+  ) {
+
+    if (
+      menuButtons[i]
+        .textContent
+        .trim() ===
+      moduleName.replace(
+        " 🎫",
+        ""
+      )
+    ) {
+
+      selectModule(
+        menuButtons[i]
+          .textContent,
+        menuButtons[i]
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  selectModule(
+    moduleName,
+    null
   );
 
 }
@@ -461,6 +660,7 @@ if (
 
 let currentAppointments =
   [];
+
 
 let appointmentCalendarDate =
   new Date();
