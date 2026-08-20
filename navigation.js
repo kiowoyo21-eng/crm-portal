@@ -71,12 +71,25 @@ const CRM_ROLE_MENUS = {
 
 function buildSidebar(role) {
 
+  const menu =
+    document.getElementById(
+      "sidebarMenu"
+    );
 
 
- const selectedMenu =
-  CRM_ROLE_MENUS[role] || [
-    "Dashboard"
-  ];
+  if (!menu) {
+    return;
+  }
+
+
+  menu.innerHTML = "";
+
+
+  const selectedMenu =
+    CRM_ROLE_MENUS[role] || [
+      "Dashboard"
+    ];
+
 
   selectedMenu.forEach(
     function(
@@ -125,8 +138,6 @@ function buildSidebar(role) {
   );
 
 }
-
-
 // ========================================
 // MODULE SELECTION
 // ========================================
