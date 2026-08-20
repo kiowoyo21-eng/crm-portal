@@ -1594,3 +1594,386 @@ function openLeadFromDashboard(
   );
 
 }
+
+
+async function openPMTodayInquiriesQueue() {
+
+  const modal =
+    openDashboardQueueModal(
+      "Today's Inquiries",
+      "Customer inquiries created today."
+    );
+
+  try {
+
+    const result =
+      await crmApi(
+        "getLeadsData"
+      );
+
+    if (
+      !result ||
+      !result.success
+    ) {
+
+      modal.body.innerHTML = `
+        <div class="crm-queue-empty">
+          Unable to load today's inquiries.
+        </div>
+      `;
+
+      return;
+    }
+
+    const today =
+      new Date();
+
+    const leads =
+      (result.leads || [])
+        .filter(function(lead) {
+
+          const createdAt =
+            new Date(
+              lead.createdAt
+            );
+
+          return (
+            !isNaN(
+              createdAt.getTime()
+            ) &&
+            createdAt.getFullYear() ===
+              today.getFullYear() &&
+            createdAt.getMonth() ===
+              today.getMonth() &&
+            createdAt.getDate() ===
+              today.getDate()
+          );
+
+        });
+
+    if (!leads.length) {
+
+      modal.body.innerHTML = `
+        <div class="crm-queue-empty">
+
+          <div class="crm-queue-empty-icon">
+            I
+          </div>
+
+          <strong>
+            No inquiries today
+          </strong>
+
+          <span>
+            No customer inquiries were
+            created today.
+          </span>
+
+        </div>
+      `;
+
+      return;
+    }
+
+    let html = `
+      <div class="crm-queue-list">
+    `;
+
+    leads.forEach(
+      function(lead) {
+
+        html += `
+
+          <div class="crm-queue-item">
+
+            <div class="crm-queue-main">
+
+              <div class="crm-queue-name">
+                ${escapeHtml(
+                  lead.customerName || "—"
+                )}
+              </div>
+
+              <div class="crm-queue-meta">
+
+                <span>
+                  ${escapeHtml(
+                    lead.vehicle || "—"
+                  )}
+                </span>
+
+                <span>
+                  ${escapeHtml(
+                    lead.branchId || "—"
+                  )}
+                </span>
+
+                <span>
+                  ${escapeHtml(
+                    lead.inquirySource || "—"
+                  )}
+                </span>
+
+              </div>
+
+              <div class="crm-queue-detail">
+                ${escapeHtml(
+                  lead.concern ||
+                  "No additional details."
+                )}
+              </div>
+
+            </div>
+
+            <div class="crm-queue-actions">
+
+              <button
+                type="button"
+                class="secondary-action"
+                onclick="closePMDashboardQueue(); openLeadFromDashboard('${escapeJs(
+                  lead.leadId
+                )}')"
+              >
+                VIEW LEAD
+              </button>
+
+            </div>
+
+          </div>
+        `;
+
+      }
+    );
+
+    html += `
+      </div>
+
+      <div class="crm-queue-footer">
+
+        <span>
+          ${leads.length}
+          ${leads.length === 1
+            ? "inquiry"
+            : "inquiries"}
+        </span>
+
+        <button
+          type="button"
+          class="primary-action"
+          onclick="closePMDashboardQueue(); selectDashboardModule('Leads')"
+        >
+          OPEN LEADS
+        </button>
+
+      </div>
+    `;
+
+    modal.body.innerHTML =
+      html;
+
+  } catch (error) {
+
+    console.error(
+      "Today's inquiries error:",
+      error
+    );
+
+    modal.body.innerHTML = `
+      <div class="crm-queue-empty">
+        Unable to connect to the CRM.
+      </div>
+    `;
+
+  }
+
+}
+
+async function openPMTodayBookingsQueue() {
+
+  const modal =
+    openDashboardQueueModal(
+      "Appointments Created Today",
+      "Appointments booked into the CRM today."
+    );
+
+  try {
+
+    const result =
+      await crmApi(
+        "getAppointmentsData"
+      );
+
+    if (
+      !result ||
+      !result.success
+    ) {
+
+      modal.body.innerHTML = `
+        <div class="crm-queue-empty">
+          Unable to load today's bookings.
+        </div>
+      `;
+
+      return;
+    }
+
+    const today =
+      new Date();
+
+    const appointments =
+      (result.appointments || [])
+        .filter(function(item) {
+
+          const createdAt =
+            new Date(
+              item.createdAt
+            );
+
+          return (
+            !isNaN(
+              createdAt.getTime()
+            ) &&
+            createdAt.getFullYear() ===
+              today.getFullYear() &&
+            createdAt.getMonth() ===
+              today.getMonth() &&
+            createdAt.getDate() ===
+              today.getDate()
+          );
+
+        });
+
+    if (!appointments.length) {
+
+      modal.body.innerHTML = `
+        <div class="crm-queue-empty">
+
+          <div class="crm-queue-empty-icon">
+            A
+          </div>
+
+          <strong>
+            No bookings created today
+          </strong>
+
+          <span>
+            No appointments were created
+            today.
+          </span>
+
+        </div>
+      `;
+
+      return;
+    }
+
+    let html = `
+      <div class="crm-queue-list">
+    `;
+
+    appointments.forEach(
+      function(item) {
+
+        html += `
+
+          <div class="crm-queue-item">
+
+            <div class="crm-queue-main">
+
+              <div class="crm-queue-name">
+                ${escapeHtml(
+                  item.customerName || "—"
+                )}
+              </div>
+
+              <div class="crm-queue-meta">
+
+                <span>
+                  ${escapeHtml(
+                    item.appointmentDate || "—"
+                  )}
+                </span>
+
+                <span>
+                  ${escapeHtml(
+                    item.appointmentTime || "—"
+                  )}
+                </span>
+
+                <span>
+                  ${escapeHtml(
+                    item.vehicle || "—"
+                  )}
+                </span>
+
+                <span>
+                  ${escapeHtml(
+                    item.branchId || "—"
+                  )}
+                </span>
+
+              </div>
+
+              <div class="crm-queue-detail">
+                ${escapeHtml(
+                  item.service ||
+                  "Appointment"
+                )}
+              </div>
+
+            </div>
+
+            <div class="crm-queue-status">
+              ${escapeHtml(
+                item.status || "Booked"
+              )}
+            </div>
+
+          </div>
+        `;
+
+      }
+    );
+
+    html += `
+      </div>
+
+      <div class="crm-queue-footer">
+
+        <span>
+          ${appointments.length}
+          ${appointments.length === 1
+            ? "booking"
+            : "bookings"}
+        </span>
+
+        <button
+          type="button"
+          class="primary-action"
+          onclick="closePMDashboardQueue(); selectDashboardModule('Appointments')"
+        >
+          OPEN APPOINTMENTS
+        </button>
+
+      </div>
+    `;
+
+    modal.body.innerHTML =
+      html;
+
+  } catch (error) {
+
+    console.error(
+      "Today's bookings error:",
+      error
+    );
+
+    modal.body.innerHTML = `
+      <div class="crm-queue-empty">
+        Unable to connect to the CRM.
+      </div>
+    `;
+
+  }
+
+}
