@@ -55,7 +55,6 @@ function buildSidebar(role) {
       "Roles & Permissions",
       "Branches",
       "System Configuration",
-      "Support",
       "System Logs",
       "Reports"
     ],
