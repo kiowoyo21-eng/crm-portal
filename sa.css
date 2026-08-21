@@ -1,0 +1,40 @@
+.sa-my-opportunity-row{background:rgba(242,181,29,.06)}.sa-my-opportunity-row:hover{background:rgba(242,181,29,.10)}
+
+
+/* SA Daily Appointments */
+.sa-daily-toolbar {
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sa-date-actions,
+.sa-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#saAppointmentDatePicker {
+  width: auto;
+  min-width: 160px;
+}
+
+#saAppointmentDateLabel {
+  color: #f2f2f2;
+  font-size: 13px;
+}
+
+/* SA lead operational restriction */
+body .sa-lead-status-readonly {
+  pointer-events: none;
+}
+
+/* Catalog */
+#suppliersView .table-wrap,
+#productsView .table-wrap,
+#inventoryView .table-wrap,
+#saAppointmentsView .table-wrap {
+  overflow-x: auto;
+}

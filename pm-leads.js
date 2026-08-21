@@ -1,3 +1,120 @@
+function isSALeadUser_() {
+  return String(
+    currentUser &&
+    (currentUser.systemRole || currentUser.role) ||
+    ""
+  ).trim().toUpperCase() === "SA";
+}
+
+function getSALeadActionLabel_(lead) {
+  const status = String(lead && lead.status || "").trim();
+
+  if (
+    status === "Booked" ||
+    status === "Remind" ||
+    status === "Rescheduled"
+  ) {
+    return "RESCHEDULE";
+  }
+
+  return "BOOK";
+}
+
+function openSALeadBooking(leadId) {
+  const lead = currentLeads.find(function(item) {
+    return String(item.leadId) === String(leadId);
+  });
+
+  if (!lead) {
+    alert("Lead record not found.");
+    return;
+  }
+
+  editLead(leadId);
+
+  const alreadyScheduled = [
+    "Booked",
+    "Remind",
+    "Rescheduled"
+  ].includes(String(lead.status || "").trim());
+
+  const statusSelect = document.getElementById("editLeadStatus");
+  if (statusSelect) {
+    statusSelect.innerHTML = alreadyScheduled
+      ? '<option value="Rescheduled">Rescheduled</option>'
+      : '<option value="Booked">Booked</option>';
+
+    statusSelect.value = alreadyScheduled
+      ? "Rescheduled"
+      : "Booked";
+
+    statusSelect.disabled = true;
+  }
+
+  [
+    "editLeadCustomerName",
+    "editLeadContactNumber",
+    "editLeadVehicle",
+    "editLeadYear",
+    "editLeadPlate",
+    "editLeadBranch",
+    "editLeadSource",
+    "editLeadService",
+    "editLeadAssignedPm",
+    "editLeadConcern"
+  ].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+
+  const bookedBy = document.getElementById("editLeadBookedBy");
+  if (bookedBy) {
+    bookedBy.value =
+      currentUser.fullName ||
+      currentUser.userId ||
+      "";
+    bookedBy.disabled = true;
+  }
+
+  toggleEditLeadAppointmentDate();
+
+  const title = document.querySelector(
+    "#editLeadModal .crm-modal-title"
+  );
+
+  if (title) {
+    title.textContent = alreadyScheduled
+      ? "Reschedule Appointment"
+      : "Book Appointment";
+  }
+}
+
+function applySALeadCreateMode_() {
+  if (!isSALeadUser_()) return;
+
+  const status = document.getElementById("newLeadStatus");
+  const branch = document.getElementById("newLeadBranch");
+  const appointmentGroup = document.getElementById("newLeadAppointmentGroup");
+
+  if (status) {
+    status.innerHTML = '<option value="Interested">Interested</option>';
+    status.value = "Interested";
+    status.disabled = true;
+
+    const group = status.closest(".form-group");
+    if (group) group.style.display = "none";
+  }
+
+  if (branch) {
+    branch.value = currentUser.branchId || "";
+    branch.disabled = true;
+  }
+
+  if (appointmentGroup) {
+    appointmentGroup.style.display = "none";
+  }
+}
+
 async function loadLeads() {
 
   if (!currentUser) {
@@ -143,12 +260,11 @@ function renderLeadsTable(leads) {
       "leadsTableBody"
     );
 
-
   if (!leads.length) {
 
     body.innerHTML = `
       <tr>
-        <td colspan="10" class="table-empty">
+        <td colspan="11" class="table-empty">
           No leads found.
         </td>
       </tr>
@@ -158,8 +274,59 @@ function renderLeadsTable(leads) {
   }
 
 
+  const isSA =
+    isSALeadUser_();
+
+
   body.innerHTML =
     leads.map(function(lead) {
+
+      const statusCell =
+        isSA
+          ? `
+              <span class="request-status-badge">
+                ${escapeHtml(lead.status || "—")}
+              </span>
+            `
+          : `
+              <select
+                class="status-select"
+                data-original-status="${escapeHtml(lead.status)}"
+                onchange="handleInlineStatusChange(
+                  '${escapeJs(lead.leadId)}',
+                  this
+                )"
+              >
+                ${buildLeadStatusOptions(lead.status)}
+              </select>
+            `;
+
+
+      const actionCell =
+        isSA
+          ? `
+              <button
+                class="table-action"
+                type="button"
+                onclick="openSALeadBooking(
+                  '${escapeJs(lead.leadId)}'
+                )"
+              >
+                ${getSALeadActionLabel_(lead)}
+              </button>
+            `
+          : `
+              <button
+                class="table-action"
+                type="button"
+                onclick="editLead(
+                  '${escapeJs(lead.leadId)}'
+                )"
+              >
+                EDIT
+              </button>
+            `;
+
 
       return `
         <tr>
@@ -174,96 +341,37 @@ function renderLeadsTable(leads) {
             </span>
           </td>
 
-
           <td class="vehicle-cell">
             ${escapeHtml(lead.vehicle)}
 
             <span>
-              ${escapeHtml(
-                String(lead.year || "")
-              )}
+              ${escapeHtml(String(lead.year || ""))}
               ${lead.plateNumber
-                ? " • " +
-                  escapeHtml(lead.plateNumber)
+                ? " • " + escapeHtml(lead.plateNumber)
                 : ""}
             </span>
           </td>
 
-
           <td>
             <span class="branch-chip">
-              ${escapeHtml(lead.branchId)}
+              ${escapeHtml(lead.branchId || "N/A")}
             </span>
           </td>
 
-
-          <td>
-            ${escapeHtml(lead.inquirySource)}
-          </td>
-
-          <td>
-            ${escapeHtml(lead.service)}
-          </td>
-
-
-          <td>
-            ${escapeHtml(lead.concern)}
-          </td>
-
-
-          <td>
-
-            <select
-  class="status-select"
-  data-original-status="${escapeHtml(lead.status)}"
-  onchange="handleInlineStatusChange(
-    '${escapeJs(lead.leadId)}',
-    this
-  )"
->
-  ${buildLeadStatusOptions(lead.status)}
-</select>
-
-          </td>
-
-
-          <td>
-            ${escapeHtml(lead.assignedPm)}
-          </td>
-
-
-          <td>
-            ${escapeHtml(
-              lead.appointmentDate || "—"
-            )}
-          </td>
-
-
-          <td>
-            ${escapeHtml(lead.createdAt)}
-          </td>
-
-
-          <td>
-
-            <button
-              class="table-action"
-              onclick="editLead(
-                '${escapeJs(lead.leadId)}'
-              )"
-            >
-              EDIT
-            </button>
-
-          </td>
+          <td>${escapeHtml(lead.inquirySource)}</td>
+          <td>${escapeHtml(lead.service)}</td>
+          <td>${escapeHtml(lead.concern)}</td>
+          <td>${statusCell}</td>
+          <td>${escapeHtml(lead.assignedPm || "—")}</td>
+          <td>${escapeHtml(lead.appointmentDate || "—")}</td>
+          <td>${escapeHtml(lead.createdAt)}</td>
+          <td>${actionCell}</td>
 
         </tr>
       `;
 
     }).join("");
 }
-
-
 
 function escapeHtml(value) {
 
@@ -995,7 +1103,7 @@ function openAddLeadModal() {
 
   modal.classList.add("show");
 
-  
+  applySALeadCreateMode_();
 }
 
 function closeAddLeadModal() {
@@ -1144,6 +1252,13 @@ document
 
       };
 
+      if (isSALeadUser_()) {
+        leadData.status = "Interested";
+        leadData.branchId =
+          currentUser.branchId || leadData.branchId;
+        leadData.appointmentDate = "";
+      }
+
 
       message.className =
         "modal-message";
@@ -1235,6 +1350,24 @@ document
 function editLead(leadId) {
 
   try {
+
+    [
+      "editLeadCustomerName",
+      "editLeadContactNumber",
+      "editLeadVehicle",
+      "editLeadYear",
+      "editLeadPlate",
+      "editLeadBranch",
+      "editLeadSource",
+      "editLeadService",
+      "editLeadStatus",
+      "editLeadAssignedPm",
+      "editLeadBookedBy",
+      "editLeadConcern"
+    ].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.disabled = false;
+    });
 
     const lead =
       currentLeads.find(function(item) {
@@ -1559,6 +1692,25 @@ document
             .trim()
 
       };
+
+      if (isSALeadUser_()) {
+        const saStatus =
+          document.getElementById("editLeadStatus").value;
+
+        Object.keys(updates).forEach(function(key) {
+          if (
+            [
+              "status",
+              "appointmentDate",
+              "appointmentTime"
+            ].indexOf(key) === -1
+          ) {
+            delete updates[key];
+          }
+        });
+
+        updates.status = saStatus;
+      }
 
 
       // =========================
