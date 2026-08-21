@@ -255,6 +255,12 @@ function selectModule(
     );
 
 
+  const saAppointmentsView =
+    document.getElementById(
+      "saAppointmentsView"
+    );
+
+
   const saOpportunitiesView =
     document.getElementById(
       "saOpportunitiesView"
@@ -288,6 +294,7 @@ function selectModule(
     saDashboardView,
     leadsView,
     appointmentsView,
+    saAppointmentsView,
     saOpportunitiesView,
     requestsView,
     reportsView,
@@ -418,6 +425,36 @@ function selectModule(
     moduleName ===
     "Appointments"
   ) {
+
+    if (
+      currentRole ===
+      "SA"
+    ) {
+
+      if (
+        saAppointmentsView
+      ) {
+
+        saAppointmentsView.style.display =
+          "block";
+
+      }
+
+
+      if (
+        typeof loadSAAppointments ===
+        "function"
+      ) {
+
+        loadSAAppointments();
+
+      }
+
+
+      return;
+
+    }
+
 
     if (
       appointmentsView
